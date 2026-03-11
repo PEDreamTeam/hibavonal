@@ -1,6 +1,6 @@
 # HibaVonal
 
-A full-stack application with a Flask backend and a modern frontend.
+A full-stack application with a Flask backend and a React frontend.
 
 ## Project Structure
 
