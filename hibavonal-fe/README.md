@@ -5,4 +5,4 @@
 > Prerequisite: node lts is installed
 
 > npm install  
-> npm run dev  
+> npm run dev
