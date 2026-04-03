@@ -63,3 +63,24 @@ class Tool(db.Model):
     ticket_type_tools = db.relationship("TicketTypeTool", back_populates="tool", lazy=True)
     tool_orders = db.relationship("ToolOrder", back_populates="tool", lazy=True)
     
+class TicketTypeTool(db.Model):
+    __tablename__ = "ticket_type_tool"
+
+    ticket_type_id = db.Column(
+        db.Integer, db.ForeignKey("ticket_type.ticket_type_id"), primary_key=True
+    )
+    tool_id = db.Column(db.Integer, db.ForeignKey("tool.tool_id"), primary_key=True)
+
+    ticket_type = db.relationship("TicketType", back_populates="ticket_type_tools")
+    tool = db.relationship("Tool", back_populates="ticket_type_tools")
+    
+class ToolOrder(db.Model):
+    __tablename__ = "tool_order"
+
+    tool_order_id = db.Column(db.Integer, primary_key=True)
+    tool_id = db.Column(db.Integer, db.ForeignKey("tool.tool_id"), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    details = db.Column(db.String(255), nullable=True)
+    status = db.Column(db.Enum(ToolOrderStatus), nullable=False)
+
+    tool = db.relationship("Tool", back_populates="tool_orders")
