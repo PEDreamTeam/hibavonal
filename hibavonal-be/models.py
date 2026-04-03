@@ -31,7 +31,7 @@ class User(db.Model):
     __tablename__ = "user"
     
     user_id = db.Column(db.Integer, primary_key=True)
-    room_id = db.Column(db.Integer, db.ForeignKey("room.room_id"), nullable=False)
+    room_id = db.Column(db.Integer, db.ForeignKey("room.room_id"), nullable=True)
     username = db.Column(db.String(255), unique=True, nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
@@ -49,7 +49,7 @@ class TicketType(db.Model):
 
     ticket_type_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.String(255), nullable=True)
+    details = db.Column(db.String(255), nullable=True)
     
     ticket = db.relationship("Ticket", back_populates="ticket_type", lazy=True)
     ticket_type_tools = db.relationship("TicketTypeTool", back_populates="ticket_type", lazy=True)
