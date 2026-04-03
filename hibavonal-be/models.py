@@ -18,10 +18,22 @@ class ToolOrderStatus(enum.Enum):
     ready = "ready"
     
 class Room(db.Model):
+    __tablename__ = "room"
+
+    room_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    notes = db.Column(db.String(255), nullable=True)
+
+    user = db.relationship("User", back_populates="room", lazy=True)
+    ticket = db.relationship("Ticket", back_populates="room", lazy=True)
+
+class User(db.Model):
+    __tablename__ = "user"
+    
     room_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     notes = db.Column(db.String(255), nullable=True)
     
-    user = db.relationship("User", back_populates="room", lazy=True)
-    ticket = db.relationship("Ticket", back_populates="room", lazy=True)
+    users = db.relationship("User", back_populates="room", lazy=True)
+    tickets = db.relationship("Ticket", back_populates="room", lazy=True)
     
