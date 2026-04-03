@@ -44,4 +44,22 @@ class User(db.Model):
     maintainer_ticket = db.relationship("Ticket", back_populates="maintainer",
                                      lazy=True, foreign_keys="Ticket.maintainer_id")
     
+class TicketType(db.Model):
+    __tablename__ = "ticket_type"
+
+    ticket_type_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.String(255), nullable=True)
+    
+    ticket = db.relationship("Ticket", back_populates="ticket_type", lazy=True)
+    ticket_type_tools = db.relationship("TicketTypeTool", back_populates="ticket_type", lazy=True)
+    
+class Tool(db.Model):
+    __tablename__ = "tool"
+
+    tool_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    
+    ticket_type_tools = db.relationship("TicketTypeTool", back_populates="tool", lazy=True)
+    tool_orders = db.relationship("ToolOrder", back_populates="tool", lazy=True)
     
