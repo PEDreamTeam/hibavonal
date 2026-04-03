@@ -84,3 +84,45 @@ class ToolOrder(db.Model):
     status = db.Column(db.Enum(ToolOrderStatus), nullable=False)
 
     tool = db.relationship("Tool", back_populates="tool_orders")
+
+class Ticket(db.Model):
+    __tablename__ = "ticket"
+    __table_args__ = (
+        CheckConstraint("priority >= 0 AND priority <= 5", name="check_ticket_priority"),
+    )
+
+    ticket_id = db.Column(db.Integer, primary_key=True)
+    room_id = db.Column(db.Integer, db.ForeignKey("room.room_id"), nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey("user.user_id"), nullable=False)
+    maintainer_id = db.Column(db.Integer, db.ForeignKey("user.user_id"), nullable=False)
+    ticket_type_id = db.Column(
+        db.Integer, db.ForeignKey("ticket_type.ticket_type_id"), nullable=False
+    )
+    details = db.Column(db.String(255), nullable=False)
+    status = db.Column(db.Enum(TicketStatus), nullable=False)
+    priority = db.Column(db.Integer, nullable=False)
+
+    room = db.relationship("Room", back_populates="tickets")
+    student = db.relationship(
+        "User", foreign_keys=[student_id], back_populates="student_tickets"
+    )
+    maintainer = db.relationship(
+        "User", foreign_keys=[maintainer_id], back_populates="maintainer_tickets"
+    )
+    ticket_type = db.relationship("TicketType", back_populates="tickets")
+
+    student_feedback = db.relationship(
+        "StudentFeedback", back_populates="ticket", uselist=False
+    )
+
+
+class StudentFeedback(db.Model):
+    __tablename__ = "student_feedback"
+
+    student_feedback_id = db.Column(db.Integer, primary_key=True)
+    ticket_id = db.Column(
+        db.Integer, db.ForeignKey("ticket.ticket_id"), unique=True, nullable=False
+    )
+    details = db.Column(db.String(255), nullable=False)
+
+    ticket = db.relationship("Ticket", back_populates="student_feedback")
