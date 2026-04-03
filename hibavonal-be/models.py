@@ -30,10 +30,18 @@ class Room(db.Model):
 class User(db.Model):
     __tablename__ = "user"
     
-    room_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    notes = db.Column(db.String(255), nullable=True)
+    user_id = db.Column(db.Integer, primary_key=True)
+    room_id = db.Column(db.Integer, db.ForeignKey("room.room_id"), nullable=False)
+    username = db.Column(db.String(255), unique=True, nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.Enum(UserRole), nullable=False)
     
-    users = db.relationship("User", back_populates="room", lazy=True)
-    tickets = db.relationship("Ticket", back_populates="room", lazy=True)
+    room = db.relationship("Room", back_populates="user")
+
+    student_ticket = db.relationship("Ticket", back_populates="student", 
+                                     lazy=True, foreign_keys="Ticket.student_id")
+    maintainer_ticket = db.relationship("Ticket", back_populates="maintainer",
+                                     lazy=True, foreign_keys="Ticket.maintainer_id")
+    
     
