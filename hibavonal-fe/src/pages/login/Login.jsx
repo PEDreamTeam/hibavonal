@@ -8,31 +8,25 @@ import {
   Alert,
 } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { apiPost } from '../../api/fetcher';
+import useLogin from '../../api/hooks/useLogin';
 import useAppStore from '../../store/useAppStore';
 
 const Login = () => {
   const navigate = useNavigate();
   const setAuth = useAppStore((s) => s.setAuth);
+  const { login, isLoading, error, resetError } = useLogin();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
+    resetError();
 
-    try {
-      const data = await apiPost('/api/auth/login', { email, password });
+    const data = await login({ email, password });
+    if (data) {
       setAuth(data.user, data.token);
       navigate('/');
-    } catch (err) {
-      setError(err.message || 'Login failed');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -80,10 +74,10 @@ const Login = () => {
             variant="contained"
             fullWidth
             size="large"
-            disabled={loading}
+            disabled={isLoading}
             sx={{ mt: 2, mb: 2 }}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {isLoading ? 'Logging in...' : 'Login'}
           </Button>
         </Box>
 

@@ -9,7 +9,7 @@ import {
   MenuItem,
 } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { apiPost } from '../../api/fetcher';
+import useSignup from '../../api/hooks/useSignup';
 import useAppStore from '../../store/useAppStore';
 
 const ROLES = [
@@ -22,32 +22,21 @@ const ROLES = [
 const Signup = () => {
   const navigate = useNavigate();
   const setAuth = useAppStore((s) => s.setAuth);
+  const { signup, isLoading, error, resetError } = useSignup();
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('student');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
+    resetError();
 
-    try {
-      const data = await apiPost('/api/auth/signup', {
-        username,
-        email,
-        password,
-        role,
-      });
+    const data = await signup({ username, email, password, role });
+    if (data) {
       setAuth(data.user, data.token);
       navigate('/');
-    } catch (err) {
-      setError(err.message || 'Signup failed');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -117,10 +106,10 @@ const Signup = () => {
             variant="contained"
             fullWidth
             size="large"
-            disabled={loading}
+            disabled={isLoading}
             sx={{ mt: 2, mb: 2 }}
           >
-            {loading ? 'Signing up...' : 'Sign Up'}
+            {isLoading ? 'Signing up...' : 'Sign Up'}
           </Button>
         </Box>
 
