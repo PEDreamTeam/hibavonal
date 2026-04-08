@@ -10,18 +10,24 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  Typography,
+  Button,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
+import useAppStore from '../store/useAppStore';
 
 const DRAWER_WIDTH = 250;
 
-export default function Layout({ children }) {
+const Layout = ({ children }) => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAppStore();
 
   const handleDrawerToggle = () => {
     setOpenDrawer(!openDrawer);
@@ -33,7 +39,6 @@ export default function Layout({ children }) {
   };
 
   const menuItems = [
-     { label: 'Tickets', icon: <HomeIcon />, path: '/tickets' },
     { label: 'Home', icon: <HomeIcon />, path: '/' },
     { label: 'Login', icon: <LoginIcon />, path: '/login' },
   ];
@@ -46,6 +51,21 @@ export default function Layout({ children }) {
         </IconButton>
       </Box>
       <Divider />
+
+      {isAuthenticated && (
+        <>
+          <Box sx={{ px: 2, py: 1.5 }}>
+            <Typography variant="subtitle1" fontWeight="bold">
+              {user?.username || user?.email}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              {user?.role}
+            </Typography>
+          </Box>
+          <Divider />
+        </>
+      )}
+
       <List sx={{ cursor: 'pointer' }}>
         {menuItems.map((item) => (
           <ListItem
@@ -57,12 +77,21 @@ export default function Layout({ children }) {
             <ListItemText primary={item.label} />
           </ListItem>
         ))}
+
+        {isAuthenticated && (
+          <ListItem button onClick={handleLogout}>
+            <ListItemIcon>
+              <LogoutIcon />
+            </ListItemIcon>
+            <ListItemText primary="Logout" />
+          </ListItem>
+        )}
       </List>
     </Box>
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box>
       <AppBar
         position="fixed"
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -78,6 +107,18 @@ export default function Layout({ children }) {
             <MenuIcon />
           </IconButton>
           <Box sx={{ flexGrow: 1 }} />
+          {isAuthenticated ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="body2">{user?.username}</Typography>
+              <Button color="inherit" size="small" onClick={handleLogout}>
+                Logout
+              </Button>
+            </Box>
+          ) : (
+            <Button color="inherit" onClick={() => navigate('/login')}>
+              Login
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
 
@@ -112,4 +153,6 @@ export default function Layout({ children }) {
       </Box>
     </Box>
   );
-}
+};
+
+export default Layout;

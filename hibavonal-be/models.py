@@ -102,14 +102,14 @@ class Ticket(db.Model):
     status = db.Column(db.Enum(TicketStatus), nullable=False)
     priority = db.Column(db.Integer, nullable=False)
 
-    room = db.relationship("Room", back_populates="tickets")
+    room = db.relationship("Room", back_populates="ticket")
     student = db.relationship(
-        "User", foreign_keys=[student_id], back_populates="student_tickets"
+        "User", foreign_keys=[student_id], back_populates="student_ticket"
     )
     maintainer = db.relationship(
-        "User", foreign_keys=[maintainer_id], back_populates="maintainer_tickets"
+        "User", foreign_keys=[maintainer_id], back_populates="maintainer_ticket"
     )
-    ticket_type = db.relationship("TicketType", back_populates="tickets")
+    ticket_type = db.relationship("TicketType", back_populates="ticket")
 
     student_feedback = db.relationship(
         "StudentFeedback", back_populates="ticket", uselist=False
