@@ -33,7 +33,7 @@ export default function Layout({ children }) {
   };
 
   const menuItems = [
-     { label: 'Tickets', icon: <HomeIcon />, path: '/' },
+     { label: 'Tickets', icon: <HomeIcon />, path: '/tickets' },
     { label: 'Home', icon: <HomeIcon />, path: '/' },
     { label: 'Login', icon: <LoginIcon />, path: '/login' },
   ];
