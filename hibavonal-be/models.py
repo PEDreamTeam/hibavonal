@@ -11,6 +11,7 @@ class UserRole(enum.Enum):
     
 class TicketStatus(enum.Enum):
     in_progress = "in_progress"
+    ready_to_done = "ready_to_done"
     done = "done"
     
 class ToolOrderStatus(enum.Enum):
@@ -99,8 +100,10 @@ class Ticket(db.Model):
         db.Integer, db.ForeignKey("ticket_type.ticket_type_id"), nullable=False
     )
     details = db.Column(db.String(255), nullable=False)
-    status = db.Column(db.Enum(TicketStatus), nullable=False)
+    status = db.Column(db.Enum(TicketStatus),nullable=False,default=TicketStatus.in_progress
+)
     priority = db.Column(db.Integer, nullable=False)
+    is_deleted = db.Column(db.Boolean, nullable=False, default=False)
 
     room = db.relationship("Room", back_populates="tickets")
     student = db.relationship(
