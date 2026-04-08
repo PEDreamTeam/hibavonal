@@ -6,24 +6,34 @@ import {
   TextField,
   Button,
   Alert,
+  MenuItem,
 } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import useLogin from '../../api/hooks/useLogin';
+import useSignup from '../../api/hooks/useSignup';
 import useAppStore from '../../store/useAppStore';
 
-const Login = () => {
+const ROLES = [
+  { value: 'student', label: 'Student' },
+  { value: 'maintainer', label: 'Maintainer' },
+  { value: 'maintenance_manager', label: 'Maintenance Manager' },
+  { value: 'admin', label: 'Admin' },
+];
+
+const Signup = () => {
   const navigate = useNavigate();
   const setAuth = useAppStore((s) => s.setAuth);
-  const { login, isLoading, error, resetError } = useLogin();
+  const { signup, isLoading, error, resetError } = useSignup();
 
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('student');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     resetError();
 
-    const data = await login({ email, password });
+    const data = await signup({ username, email, password, role });
     if (data) {
       setAuth(data.user, data.token);
       navigate('/');
@@ -41,7 +51,7 @@ const Login = () => {
         }}
       >
         <Typography variant="h4" component="h1" gutterBottom>
-          Login
+          Sign Up
         </Typography>
 
         {error && (
@@ -51,6 +61,14 @@ const Login = () => {
         )}
 
         <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+          <TextField
+            label="Username"
+            fullWidth
+            required
+            margin="normal"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
           <TextField
             label="Email"
             type="email"
@@ -69,6 +87,20 @@ const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          <TextField
+            label="Role"
+            select
+            fullWidth
+            margin="normal"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+          >
+            {ROLES.map((r) => (
+              <MenuItem key={r.value} value={r.value}>
+                {r.label}
+              </MenuItem>
+            ))}
+          </TextField>
           <Button
             type="submit"
             variant="contained"
@@ -77,17 +109,16 @@ const Login = () => {
             disabled={isLoading}
             sx={{ mt: 2, mb: 2 }}
           >
-            {isLoading ? 'Logging in...' : 'Login'}
+            {isLoading ? 'Signing up...' : 'Sign Up'}
           </Button>
         </Box>
 
         <Typography variant="body2">
-          Don&apos;t have an account?{' '}
-          <RouterLink to="/signup">Sign up</RouterLink>
+          Already have an account? <RouterLink to="/login">Login</RouterLink>
         </Typography>
       </Box>
     </Container>
   );
 };
 
-export default Login;
+export default Signup;

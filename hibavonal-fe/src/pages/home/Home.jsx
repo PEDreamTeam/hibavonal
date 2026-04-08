@@ -1,7 +1,7 @@
 import { Container, Box, Typography, Button } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
-export default function Home() {
+const Home = () => {
   return (
     <Container maxWidth="sm">
       <Box
@@ -10,7 +10,6 @@ export default function Home() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          width: '95vw',
         }}
       >
         <Typography variant="h3" component="h1" gutterBottom>
@@ -19,16 +18,11 @@ export default function Home() {
         <Typography variant="h6" color="textSecondary" paragraph>
           Welcome to the home page!
         </Typography>
-        <Button
-          component={RouterLink}
-          to="/login"
-          variant="contained"
-          color="primary"
-          size="large"
-        >
-          Go to Login
-        </Button>
+        This is the home page of the application. You can navigate to different
+        sections using the menu.
       </Box>
     </Container>
   );
-}
+};
+
+export default Home;
