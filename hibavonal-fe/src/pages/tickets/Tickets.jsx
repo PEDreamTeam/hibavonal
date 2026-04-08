@@ -62,3 +62,28 @@ const TicketItem = ({ ticket }) => {
     );
 }
 
+function TicketGroup({ title, tickets }) {
+    if (!tickets.length) return null;
+
+    return (
+        <Card sx={{ mb: 3 }}>
+            <CardContent>
+                <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    sx={{ mb: 2 }}
+                >
+                    <Typography variant="h6">{title}</Typography>
+                    <Chip label={tickets.length} />
+                </Stack>
+                <Divider sx={{ mb: 1 }} />
+                <List>
+                    {tickets.map((ticket) => (
+                        <TicketRow key={ticket.id} ticket={ticket} />
+                    ))}
+                </List>
+            </CardContent>
+        </Card>
+    );
+}
