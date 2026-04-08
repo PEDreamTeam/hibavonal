@@ -19,3 +19,8 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
+const statusLabels = {
+    in_progress: 'In progress',
+    ready_to_done: 'Ready to done',
+    done: 'Done',
+};
