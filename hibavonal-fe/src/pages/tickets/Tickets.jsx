@@ -19,6 +19,35 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
+const mockTickets = [
+    {
+        id: 1,
+        ticketName: 'Broken lamp',
+        maintainerName: 'John Doe',
+        roomName: 'A102',
+        date: '2026-04-03',
+        status: 'in_progress',
+    },
+    {
+        id: 2,
+        ticketName: 'Window issue',
+        maintainerName: 'Jane Smith',
+        roomName: 'B210',
+        date: '2026-04-02',
+        status: 'ready_to_done',
+    },
+    {
+        id: 3,
+        ticketName: 'Heating problem',
+        maintainerName: 'John Doe',
+        roomName: 'C011',
+        date: '2026-04-01',
+        status: 'done',
+    },
+];
+
+
+
 const statusLabels = {
     in_progress: 'In progress',
     ready_to_done: 'Ready to done',
@@ -59,6 +88,17 @@ const TicketItem = ({ ticket }) => {
                 />
             </ListItem>
         </>
+    );
+}
+
+function TicketRow({ ticket }) {
+    return (
+        <ListItem>
+            <ListItemText
+                primary={ticket.ticketName}
+                secondary={`Maintainer: ${ticket.maintainerName} | Room: ${ticket.roomName} | Date: ${ticket.date}`}
+            />
+        </ListItem>
     );
 }
 
