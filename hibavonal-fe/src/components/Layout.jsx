@@ -40,6 +40,7 @@ const Layout = ({ children }) => {
 
   const menuItems = [
     { label: 'Home', icon: <HomeIcon />, path: '/' },
+    { label: 'Tickets', icon: <HomeIcon />, path: '/tickets' },
     { label: 'Login', icon: <LoginIcon />, path: '/login' },
   ];
 
