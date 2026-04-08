@@ -106,7 +106,14 @@ function TicketGroup({ title, tickets }) {
     if (!tickets.length) return null;
 
     return (
-        <Card sx={{ mb: 3 }}>
+       <Card
+             sx={{
+                mb: 3,
+                width: '100%',
+                maxWidth: 720,
+                mx: 'auto',
+                }}
+                >
             <CardContent>
                 <Stack
                     direction="row"
@@ -139,49 +146,71 @@ export default function Tickets() {
         };
     }, [tickets]);
 
-     const hasTickets = tickets.length > 0;
+    const hasTickets = tickets.length > 0;
 
     return (
-        <Container maxWidth="md">
-            <Box sx={{ py: 4 }}>
-                <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    sx={{ mb: 3 }}
-                >
-                    <Typography variant="h4">Tickets</Typography>
-                    <Button variant="contained" startIcon={<AddIcon />}>
-                        Create ticket
-                    </Button>
-                </Stack>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '100vh',
+                width: '100%',
+                maxWidth: 720,
+                mx: 'auto',
+                py: 4,
+                backgroundColor: '#fafafa'
+            }}
+        >
+           
+            <Box sx={{ width: '100%', px: 2 }}>
+                <Stack spacing={3}>
+                    
+                    <Stack
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="center"
+                    >
+                        <Typography variant="h4" fontWeight="bold">Tickets</Typography>
+                        <Button 
+                            variant="contained" 
+                            color="error" 
+                            startIcon={<AddIcon />}
+                            sx={{ borderRadius: 2 }}
+                        >
+                            Create ticket
+                        </Button>
+                    </Stack>
 
-                {!hasTickets ? (
-                    <Card>
-                        <CardContent>
-                            <Typography variant="h6" gutterBottom>
-                                No tickets yet
-                            </Typography>
-                            <Typography variant="body1" sx={{ mb: 2 }}>
-                                There are no tickets related to this user yet.
-                            </Typography>
-                            <Button variant="contained">Create one</Button>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    <>
-                        <TicketGroup
-                            title={statusLabels.in_progress}
-                            tickets={groupedTickets.in_progress}
-                        />
-                        <TicketGroup
-                            title={statusLabels.ready_to_done}
-                            tickets={groupedTickets.ready_to_done}
-                        />
-                        <TicketGroup title={statusLabels.done} tickets={groupedTickets.done} />
-                    </>
-                )}
+                    {!hasTickets ? (
+                        <Card sx={{ width: '100%', textAlign: 'center', py: 5 }}>
+                            <CardContent>
+                                <Typography variant="h6" gutterBottom>No tickets yet</Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                                    There are no tickets related to this user yet.
+                                </Typography>
+                                <Button variant="contained">Create one</Button>
+                            </CardContent>
+                        </Card>
+                    ) : (
+                        <Box>
+                            <TicketGroup
+                                title={statusLabels.in_progress}
+                                tickets={groupedTickets.in_progress}
+                            />
+                            <TicketGroup
+                                title={statusLabels.ready_to_done}
+                                tickets={groupedTickets.ready_to_done}
+                            />
+                            <TicketGroup 
+                                title={statusLabels.done} 
+                                tickets={groupedTickets.done} 
+                            />
+                        </Box>
+                    )}
+                </Stack>
             </Box>
-        </Container>
+        </Box>
     );
 }
