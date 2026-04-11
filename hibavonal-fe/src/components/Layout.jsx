@@ -21,7 +21,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 import useAppStore from '../store/useAppStore';
-
+import BuildIcon from '@mui/icons-material/Build';
 const DRAWER_WIDTH = 250;
 
 const Layout = ({ children }) => {
@@ -49,7 +49,8 @@ const Layout = ({ children }) => {
   if (!isAuthenticated) {
     menuItems.push(
       { label: 'Login', icon: <LoginIcon />, path: '/login' },
-      { label: 'Sign Up', icon: <PersonAddIcon />, path: '/signup' }
+      { label: 'Sign Up', icon: <PersonAddIcon />, path: '/signup' },
+      { label: 'Tool order', icon: <BuildIcon />, path: '/tool-order' }
     );
   }
 

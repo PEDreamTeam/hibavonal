@@ -3,7 +3,7 @@ import Layout from './components/Layout';
 import Home from './pages/home/Home';
 import Login from './pages/login/Login';
 import Signup from './pages/signup/Signup';
-import ToolOrderForm from './pages/tool-orders/ToolOrderForm';
+import ToolOrderForm from './pages/tool-order/ToolOrderForm';
 
 const App = () => {
   return (
