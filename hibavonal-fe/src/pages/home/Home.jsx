@@ -1,4 +1,4 @@
-import { Container, Box, Typography, Button } from '@mui/material';
+import { Container, Box, Typography, Button, Stack } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
 export default function Home() {
@@ -19,15 +19,28 @@ export default function Home() {
         <Typography variant="h6" color="textSecondary" paragraph>
           Welcome to the home page!
         </Typography>
-        <Button
-          component={RouterLink}
-          to="/login"
-          variant="contained"
-          color="primary"
-          size="large"
-        >
-          Go to Login
-        </Button>
+        <Stack direction="column" spacing={2} sx={{ width: '100%' }}>
+          <Button
+            component={RouterLink}
+            to="/create"
+            variant="contained"
+            color="primary"
+            size="large"
+            fullWidth
+          >
+            Hiba bejelentése
+          </Button>
+          <Button
+            component={RouterLink}
+            to="/login"
+            variant="outlined"
+            color="primary"
+            size="large"
+            fullWidth
+          >
+            Go to Login
+          </Button>
+        </Stack>
       </Box>
     </Container>
   );
