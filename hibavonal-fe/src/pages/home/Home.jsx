@@ -1,7 +1,7 @@
 import { Container, Box, Typography, Button, Stack } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
-export default function Home() {
+const Home = () => {
   return (
     <Container maxWidth="sm">
       <Box
@@ -10,7 +10,6 @@ export default function Home() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          width: '95vw',
         }}
       >
         <Typography variant="h3" component="h1" gutterBottom>
@@ -44,4 +43,6 @@ export default function Home() {
       </Box>
     </Container>
   );
-}
+};
+
+export default Home;

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Building body -->
+  <rect x="8" y="16" width="48" height="42" rx="3" fill="#1565C0"/>
+  <!-- Roof -->
+  <polygon points="4,18 32,2 60,18" fill="#0D47A1"/>
+  <!-- Door -->
+  <rect x="25" y="38" width="14" height="20" rx="2" fill="#FFCA28"/>
+  <!-- Door knob -->
+  <circle cx="36" cy="50" r="2" fill="#0D47A1"/>
+  <!-- Windows row 1 -->
+  <rect x="14" y="22" width="8" height="8" rx="1" fill="#BBDEFB"/>
+  <rect x="42" y="22" width="8" height="8" rx="1" fill="#BBDEFB"/>
+  <!-- Windows row 2 -->
+  <rect x="14" y="36" width="8" height="8" rx="1" fill="#BBDEFB"/>
+  <rect x="42" y="36" width="8" height="8" rx="1" fill="#BBDEFB"/>
+  <!-- Key overlay (bottom-right) -->
+  <g transform="translate(42,44) scale(0.9)">
+    <circle cx="6" cy="6" r="5" stroke="#FFF" stroke-width="2" fill="none"/>
+    <line x1="11" y1="6" x2="22" y2="6" stroke="#FFF" stroke-width="2" stroke-linecap="round"/>
+    <line x1="18" y1="6" x2="18" y2="10" stroke="#FFF" stroke-width="2" stroke-linecap="round"/>
+    <line x1="22" y1="6" x2="22" y2="10" stroke="#FFF" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>

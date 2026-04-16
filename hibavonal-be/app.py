@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flasgger import Swagger
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_cors import CORS
 import os
 
 app = Flask(__name__)
@@ -11,18 +12,22 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
     "sqlite:///hibavonal.db"
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+CORS(app, origins=["http://localhost:5173"])
+
+import models
+
 swagger = Swagger(app)
 
-@app.after_request
-def add_cors_headers(response):
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
-    response.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS'
-    return response
+from routes.auth import auth_bp
+app.register_blueprint(auth_bp, url_prefix="/api/auth")
+
+from routes.rooms import rooms_bp
+app.register_blueprint(rooms_bp, url_prefix="/api/rooms")
 
 @app.route("/", methods=["GET"])
 def index():
