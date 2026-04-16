@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Drawer,
   AppBar,
@@ -10,18 +10,27 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  Button,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
+import BuildIcon from '@mui/icons-material/Build';
 import { useNavigate } from 'react-router-dom';
+import useAppStore from '../store/useAppStore';
 
 const DRAWER_WIDTH = 250;
 
 export default function Layout({ children }) {
   const [openDrawer, setOpenDrawer] = useState(false);
   const navigate = useNavigate();
+  const { user, isAuthenticated, fetchCurrentUser, logout } = useAppStore();
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
 
   const handleDrawerToggle = () => {
     setOpenDrawer(!openDrawer);
@@ -32,31 +41,71 @@ export default function Layout({ children }) {
     setOpenDrawer(false);
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+    setOpenDrawer(false);
+  };
+
   const menuItems = [
-    { label: 'Home', icon: <HomeIcon />, path: '/' },
-    { label: 'Login', icon: <LoginIcon />, path: '/login' },
+    { label: 'Kezdőlap', icon: <HomeIcon />, path: '/' },
+    ...(isAuthenticated && user?.role !== 'student'
+      ? [{ label: 'Szerszámrendelések', icon: <BuildIcon />, path: '/tool-orders' }]
+      : []),
+    ...(!isAuthenticated
+      ? [{ label: 'Bejelentkezés', icon: <LoginIcon />, path: '/login' }]
+      : []),
   ];
 
   const drawerContent = (
-    <Box sx={{ width: DRAWER_WIDTH }}>
+    <Box sx={{ width: DRAWER_WIDTH, display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>
         <IconButton onClick={handleDrawerToggle}>
           <CloseIcon />
         </IconButton>
       </Box>
       <Divider />
-      <List sx={{ cursor: 'pointer' }}>
-        {menuItems.map((item) => (
-          <ListItem
-            button
-            key={item.path}
-            onClick={() => handleNavigation(item.path)}
-          >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.label} />
-          </ListItem>
-        ))}
-      </List>
+      <Box sx={{ flex: 1 }}>
+        <List sx={{ cursor: 'pointer' }}>
+          {menuItems.map((item) => (
+            <ListItem
+              button
+              key={item.path}
+              onClick={() => handleNavigation(item.path)}
+            >
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.label} />
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+      {isAuthenticated && (
+        <>
+          <Divider />
+          <Box sx={{ p: 2 }}>
+            <Box sx={{ mb: 2, fontSize: '0.875rem' }}>
+              <div>
+                <strong>{user?.username}</strong>
+              </div>
+              <div sx={{
+                fontSize: '0.75rem',
+                color: '#666',
+              }}>
+                {user?.role === 'maintenance' ? 'Karbantartó' : user?.role === 'admin' ? 'Adminisztrátor' : 'Diák'}
+              </div>
+            </Box>
+            <Button
+              fullWidth
+              variant="outlined"
+              startIcon={<LogoutIcon />}
+              onClick={handleLogout}
+              size="small"
+            >
+              Kijelentkezés
+            </Button>
+          </Box>
+        </>
+      )}
     </Box>
   );
 
@@ -76,7 +125,9 @@ export default function Layout({ children }) {
           >
             <MenuIcon />
           </IconButton>
-          <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ flexGrow: 1, fontSize: '1.25rem', fontWeight: 'bold' }}>
+            Hibajelentő Rendszer
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -90,6 +141,7 @@ export default function Layout({ children }) {
           '& .MuiDrawer-paper': {
             width: DRAWER_WIDTH,
             marginTop: '64px',
+            height: 'calc(100vh - 64px)',
           },
         }}
       >
@@ -112,3 +164,4 @@ export default function Layout({ children }) {
     </Box>
   );
 }
+
