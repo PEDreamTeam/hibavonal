@@ -59,3 +59,52 @@ export async function apiPost(url, body) {
 
   return data;
 }
+
+export async function apiPut(url, body) {
+  const token = getToken();
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify(body),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    const error = new Error(data.error || 'API error');
+    error.status = res.status;
+    error.info = data;
+    throw error;
+  }
+
+  return data;
+}
+
+export async function apiDelete(url) {
+  const token = getToken();
+  const headers = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(url, {
+    method: 'DELETE',
+    headers,
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    const error = new Error(data.error || 'API error');
+    error.status = res.status;
+    error.info = data;
+    throw error;
+  }
+
+  return data;
+}

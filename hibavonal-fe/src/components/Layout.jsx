@@ -19,6 +19,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import LogoutIcon from '@mui/icons-material/Logout';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import { useNavigate } from 'react-router-dom';
 import useAppStore from '../store/useAppStore';
 
@@ -38,11 +39,28 @@ const Layout = ({ children }) => {
     setOpenDrawer(false);
   };
 
-  const menuItems = [
-    { label: 'Home', icon: <HomeIcon />, path: '/' },
-    { label: 'Tickets', icon: <ReportProblemIcon />, path: '/tickets' },
-    { label: 'Login', icon: <LoginIcon />, path: '/login' },
-  ];
+  const handleLogout = () => {
+    logout();
+    setOpenDrawer(false);
+    navigate('/login');
+  };
+
+  const menuItems = [{ label: 'Home', icon: <HomeIcon />, path: '/' }];
+
+  if (isAuthenticated && user?.role === 'admin') {
+    menuItems.push({
+      label: 'Rooms',
+      icon: <MeetingRoomIcon />,
+      path: '/rooms',
+    });
+  }
+
+  if (!isAuthenticated) {
+    menuItems.push(
+      { label: 'Login', icon: <LoginIcon />, path: '/login' },
+      { label: 'Sign Up', icon: <PersonAddIcon />, path: '/signup' }
+    );
+  }
 
   const drawerContent = (
     <Box sx={{ width: DRAWER_WIDTH }}>

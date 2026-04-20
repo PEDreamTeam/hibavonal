@@ -26,8 +26,26 @@ swagger = Swagger(app)
 from routes.auth import auth_bp
 app.register_blueprint(auth_bp, url_prefix="/api/auth")
 
+from routes.rooms import rooms_bp
+app.register_blueprint(rooms_bp, url_prefix="/api/rooms")
+
 @app.route("/", methods=["GET"])
 def index():
+    """
+    Get API status
+    ---
+    tags:
+      - Health
+    responses:
+      200:
+        description: API is running successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Hello from Flask backend!"
+    """
     return jsonify({"message": "Hello from Flask backend!"})
 
 if __name__ == "__main__":
