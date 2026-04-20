@@ -100,8 +100,9 @@ class Ticket(db.Model):
         db.Integer, db.ForeignKey("ticket_type.ticket_type_id"), nullable=False
     )
     details = db.Column(db.String(255), nullable=False)
-    status = db.Column(db.Enum(TicketStatus),nullable=False,default=TicketStatus.in_progress
-)
+    status = db.Column(
+        db.Enum(TicketStatus), nullable=False, default=TicketStatus.in_progress
+    )
     priority = db.Column(db.Integer, nullable=False)
     is_deleted = db.Column(db.Boolean, nullable=False, default=False)
 
