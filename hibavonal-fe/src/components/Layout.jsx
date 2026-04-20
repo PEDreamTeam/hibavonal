@@ -19,6 +19,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LogoutIcon from '@mui/icons-material/Logout';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import { useNavigate } from 'react-router-dom';
 import useAppStore from '../store/useAppStore';
 import BuildIcon from '@mui/icons-material/Build';
@@ -45,6 +46,14 @@ const Layout = ({ children }) => {
   };
 
   const menuItems = [{ label: 'Home', icon: <HomeIcon />, path: '/' }];
+
+  if (isAuthenticated && user?.role === 'admin') {
+    menuItems.push({
+      label: 'Rooms',
+      icon: <MeetingRoomIcon />,
+      path: '/rooms',
+    });
+  }
 
   if (!isAuthenticated) {
     menuItems.push(
