@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/home/Home';
 import Login from './pages/login/Login';
 import Signup from './pages/signup/Signup';
+import ToolOrderForm from './pages/tool-order/ToolOrderForm';
 import Rooms from './pages/rooms/Rooms';
 
 const App = () => {
@@ -13,6 +14,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/tool-order" element={<ToolOrderForm />} />
         <Route
           path="/rooms"
           element={
