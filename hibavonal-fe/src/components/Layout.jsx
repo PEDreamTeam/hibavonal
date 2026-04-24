@@ -60,7 +60,12 @@ const Layout = ({ children }) => {
     menuItems.push(
       { label: 'Login', icon: <LoginIcon />, path: '/login' },
       { label: 'Sign Up', icon: <PersonAddIcon />, path: '/signup' },
-      { label: 'Tool order', icon: <BuildIcon />, path: '/tool-order' }
+      { label: 'Tool order', icon: <BuildIcon />, path: '/tool-order' },
+      {
+        label: 'Add ticket type',
+        icon: <CategoryIcon />,
+        path: '/ticket-types/new',
+      }
     );
   }
 
