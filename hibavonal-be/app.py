@@ -3,7 +3,6 @@ from flasgger import Swagger
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
-from routes.tool_orders import tool_orders_bp
 import os
 
 app = Flask(__name__)
@@ -22,14 +21,15 @@ CORS(app, origins=["http://localhost:5173"])
 
 import models
 
+from routes.tool_orders import tool_orders_bp
 app.register_blueprint(tool_orders_bp)
 swagger = Swagger(app)
 
-from routes.auth import auth_bp
-app.register_blueprint(auth_bp, url_prefix="/api/auth")
+##from routes.auth import auth_bp
+##app.register_blueprint(auth_bp, url_prefix="/api/auth")
 
-from routes.rooms import rooms_bp
-app.register_blueprint(rooms_bp, url_prefix="/api/rooms")
+##from routes.rooms import rooms_bp
+##app.register_blueprint(rooms_bp, url_prefix="/api/rooms")
 
 @app.route("/", methods=["GET"])
 def index():

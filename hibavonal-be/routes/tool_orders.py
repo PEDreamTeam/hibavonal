@@ -1,6 +1,5 @@
 from flask import Blueprint, jsonify, request
-from app import db
-from models import ToolOrder, ToolOrderStatus, Tool
+from models import db, ToolOrder, ToolOrderStatus, Tool
 
 tool_orders_bp = Blueprint("tool_orders", __name__, url_prefix="/tool-orders")
 
