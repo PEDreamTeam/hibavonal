@@ -23,6 +23,7 @@ import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import { useNavigate } from 'react-router-dom';
 import useAppStore from '../store/useAppStore';
 import BuildIcon from '@mui/icons-material/Build';
+import RateReviewIcon from '@mui/icons-material/RateReview';
 const DRAWER_WIDTH = 250;
 
 const Layout = ({ children }) => {
@@ -59,7 +60,8 @@ const Layout = ({ children }) => {
     menuItems.push(
       { label: 'Login', icon: <LoginIcon />, path: '/login' },
       { label: 'Sign Up', icon: <PersonAddIcon />, path: '/signup' },
-      { label: 'Tool order', icon: <BuildIcon />, path: '/tool-order' }
+      { label: 'Tool order', icon: <BuildIcon />, path: '/tool-order' },
+      { label: 'Feedback', icon: <RateReviewIcon />, path: '/feedback/new' }
     );
   }
 
