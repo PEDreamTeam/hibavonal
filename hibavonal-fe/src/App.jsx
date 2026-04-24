@@ -7,6 +7,7 @@ import Login from './pages/login/Login';
 import Signup from './pages/signup/Signup';
 import ToolOrderForm from './pages/tool-order/ToolOrderForm';
 import Rooms from './pages/rooms/Rooms';
+import AddTicketTypeForm from './pages/ticket-types/AddTicketTypeForm';
 
 const App = () => {
   return (
