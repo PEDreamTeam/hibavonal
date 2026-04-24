@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/home/Home';
 import Tickets from './pages/tickets/Tickets';
 import Login from './pages/login/Login';
+import Create from './pages/create/Create';
 import Signup from './pages/signup/Signup';
 import ToolOrderForm from './pages/tool-order/ToolOrderForm';
 import Rooms from './pages/rooms/Rooms';
@@ -15,6 +16,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/tickets" element={<Tickets />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/create" element={<Create />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/tool-order" element={<ToolOrderForm />} />
         <Route
