@@ -23,6 +23,7 @@ import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import { useNavigate } from 'react-router-dom';
 import useAppStore from '../store/useAppStore';
 import BuildIcon from '@mui/icons-material/Build';
+import CategoryIcon from '@mui/icons-material/Category';
 const DRAWER_WIDTH = 250;
 
 const Layout = ({ children }) => {
