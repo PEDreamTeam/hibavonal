@@ -24,6 +24,7 @@ import { useNavigate } from 'react-router-dom';
 import useAppStore from '../store/useAppStore';
 import BuildIcon from '@mui/icons-material/Build';
 import CategoryIcon from '@mui/icons-material/Category';
+import RateReviewIcon from '@mui/icons-material/RateReview';
 import HandymanIcon from '@mui/icons-material/Handyman';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 const DRAWER_WIDTH = 250;
@@ -68,6 +69,7 @@ const Layout = ({ children }) => {
         icon: <CategoryIcon />,
         path: '/ticket-types/new',
       },
+      { label: 'Feedback', icon: <RateReviewIcon />, path: '/feedback/new' },
       { label: 'Add tool', icon: <HandymanIcon />, path: '/tools/new' }
     );
   }
