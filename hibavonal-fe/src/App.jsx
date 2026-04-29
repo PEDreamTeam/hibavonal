@@ -9,6 +9,7 @@ import ToolOrderForm from './pages/tool-order/ToolOrderForm';
 import Rooms from './pages/rooms/Rooms';
 import AddTicketTypeForm from './pages/ticket-types/AddTicketTypeForm';
 
+import AddToolForm from './pages/tools/AddToolForm';
 const App = () => {
   return (
     <Layout>
@@ -19,6 +20,7 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/tool-order" element={<ToolOrderForm />} />
         <Route path="/ticket-types/new" element={<AddTicketTypeForm />} />
+        <Route path="/tools/new" element={<AddToolForm />} />
         <Route
           path="/rooms"
           element={
