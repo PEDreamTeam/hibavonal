@@ -7,6 +7,8 @@ import Login from './pages/login/Login';
 import Signup from './pages/signup/Signup';
 import ToolOrderForm from './pages/tool-order/ToolOrderForm';
 import Rooms from './pages/rooms/Rooms';
+import AddTicketTypeForm from './pages/ticket-types/AddTicketTypeForm';
+
 import StudentFeedbackForm from './pages/feedback/StudentFeedbackForm';
 import AddToolForm from './pages/tools/AddToolForm';
 
@@ -19,6 +21,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/tool-order" element={<ToolOrderForm />} />
+        <Route path="/ticket-types/new" element={<AddTicketTypeForm />} />
         <Route path="/feedback/new" element={<StudentFeedbackForm />} />
         <Route path="/tools/new" element={<AddToolForm />} />
         <Route
