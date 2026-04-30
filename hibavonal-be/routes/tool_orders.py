@@ -6,6 +6,34 @@ tool_orders_bp = Blueprint("tool_orders", __name__, url_prefix="/tool-orders")
 
 @tool_orders_bp.route("", methods=["GET"])
 def get_tool_orders():
+    """
+    Get all tool orders
+    ---
+    tags:
+      - ToolOrders
+    responses:
+      200:
+        description: List of all tool orders
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              tool_order_id:
+                type: integer
+              tool_id:
+                type: integer
+              tool_name:
+                type: string
+                nullable: true
+              name:
+                type: string
+              details:
+                type: string
+                nullable: true
+              status:
+                type: string
+    """
     tool_orders = ToolOrder.query.all()
 
     result = []
@@ -26,6 +54,45 @@ def get_tool_orders():
 
 @tool_orders_bp.route("/<int:tool_order_id>", methods=["GET"])
 def get_tool_order(tool_order_id):
+    """
+    Get a single tool order by ID
+    ---
+    tags:
+      - ToolOrders
+    parameters:
+      - in: path
+        name: tool_order_id
+        type: integer
+        required: true
+        description: ID of the tool order to retrieve
+    responses:
+      200:
+        description: Tool order details
+        schema:
+          type: object
+          properties:
+            tool_order_id:
+              type: integer
+            tool_id:
+              type: integer
+            tool_name:
+              type: string
+              nullable: true
+            name:
+              type: string
+            details:
+              type: string
+              nullable: true
+            status:
+              type: string
+      404:
+        description: Tool order not found
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+    """
     order = ToolOrder.query.get(tool_order_id)
 
     if not order:
@@ -45,6 +112,53 @@ def get_tool_order(tool_order_id):
 
 @tool_orders_bp.route("", methods=["POST"])
 def create_tool_order():
+    """
+    Create a new tool order
+    ---
+    tags:
+      - ToolOrders
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - tool_id
+            - name
+          properties:
+            tool_id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: "New screwdriver"
+            details:
+              type: string
+              nullable: true
+              example: "Include Phillips head"
+            status:
+              type: string
+              enum: [ordered, ready]
+              example: ordered
+    responses:
+      201:
+        description: Tool order created successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            tool_order_id:
+              type: integer
+      400:
+        description: Bad request - missing or invalid required fields
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+    """
     data = request.get_json()
 
     if not data:
