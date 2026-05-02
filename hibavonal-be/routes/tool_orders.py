@@ -9,12 +9,30 @@ tool_orders_bp = Blueprint("tool_orders", __name__, url_prefix="/tool-orders")
 @token_required
 def get_tool_orders_list():
     """
-    Get list of tool orders with role-based filtering
+    Get list of tool orders with role-based filtering and sorting
     ---
     tags:
       - Tool Orders
     security:
       - Bearer: []
+    parameters:
+      - in: query
+        name: sort_by
+        type: string
+        enum: ["created_at", "name", "status"]
+        default: "created_at"
+        description: Field to sort by
+      - in: query
+        name: sort_order
+        type: string
+        enum: ["asc", "desc"]
+        default: "desc"
+        description: Sort order
+      - in: query
+        name: status
+        type: string
+        enum: ["ordered", "ready"]
+        description: Filter by status
     responses:
       200:
         description: List of tool orders visible to user
@@ -62,6 +80,30 @@ def get_tool_orders_list():
 
     if current_user.role == UserRole.maintainer:
         query = query.filter_by(created_by_id=current_user.user_id)
+
+    status_filter = request.args.get("status")
+    if status_filter:
+        try:
+            status_enum = ToolOrderStatus(status_filter)
+            query = query.filter_by(status=status_enum)
+        except ValueError:
+            return jsonify({"error": f"Invalid status filter. Must be one of: {[s.value for s in ToolOrderStatus]}"}), 400
+
+    sort_by = request.args.get("sort_by", "created_at")
+    sort_order = request.args.get("sort_order", "desc")
+
+    if sort_by not in ["created_at", "name", "status"]:
+        return jsonify({"error": "Invalid sort_by. Must be one of: created_at, name, status"}), 400
+
+    if sort_order not in ["asc", "desc"]:
+        return jsonify({"error": "Invalid sort_order. Must be asc or desc"}), 400
+
+    if sort_by == "created_at":
+        query = query.order_by(ToolOrder.created_at.desc() if sort_order == "desc" else ToolOrder.created_at.asc())
+    elif sort_by == "name":
+        query = query.order_by(ToolOrder.name.desc() if sort_order == "desc" else ToolOrder.name.asc())
+    elif sort_by == "status":
+        query = query.order_by(ToolOrder.status.desc() if sort_order == "desc" else ToolOrder.status.asc())
 
     tool_orders = query.all()
 
