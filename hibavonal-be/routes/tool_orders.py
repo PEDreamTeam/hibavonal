@@ -104,11 +104,16 @@ def get_tool_orders():
 
 
 @tool_orders_bp.route("/<int:tool_order_id>", methods=["GET"])
+@token_required
 def get_tool_order(tool_order_id):
     order = ToolOrder.query.get(tool_order_id)
 
     if not order:
         return jsonify({"error": "Tool order not found"}), 404
+
+    current_user = request.current_user
+    if current_user.role == UserRole.maintainer and order.created_by_id != current_user.user_id:
+        return jsonify({"error": "Insufficient permissions"}), 403
 
     return jsonify(
         {
@@ -118,8 +123,166 @@ def get_tool_order(tool_order_id):
             "name": order.name,
             "details": order.details,
             "status": order.status.value if order.status else None,
+            "created_by": order.created_by.username if order.created_by else None,
+            "created_at": order.created_at.isoformat() if order.created_at else None,
         }
     ), 200
+
+
+@tool_orders_bp.route("/<int:tool_order_id>", methods=["PUT"])
+@token_required
+def update_tool_order(tool_order_id):
+    """
+    Update tool order status
+    ---
+    tags:
+      - Tool Orders
+    security:
+      - Bearer: []
+    parameters:
+      - in: path
+        name: tool_order_id
+        type: integer
+        required: true
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: ["ordered", "ready"]
+              example: "ready"
+    responses:
+      200:
+        description: Tool order successfully updated
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+      400:
+        description: Bad request - invalid status
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+      401:
+        description: Unauthorized
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+      403:
+        description: Forbidden - insufficient permissions
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+      404:
+        description: Tool order not found
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+    """
+    order = ToolOrder.query.get(tool_order_id)
+
+    if not order:
+        return jsonify({"error": "Tool order not found"}), 404
+
+    current_user = request.current_user
+    if current_user.role not in [UserRole.maintainer, UserRole.maintenance_manager]:
+        return jsonify({"error": "Insufficient permissions"}), 403
+
+    if current_user.role == UserRole.maintainer and order.created_by_id != current_user.user_id:
+        return jsonify({"error": "Insufficient permissions"}), 403
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Request body is required"}), 400
+
+    status = data.get("status")
+    if not status:
+        return jsonify({"error": "Status is required"}), 400
+
+    try:
+        status_enum = ToolOrderStatus(status)
+    except ValueError:
+        return jsonify({"error": f"Invalid status. Must be one of: {[s.value for s in ToolOrderStatus]}"}), 400
+
+    order.status = status_enum
+    db.session.commit()
+
+    return jsonify({"message": "Tool order updated successfully"}), 200
+
+
+@tool_orders_bp.route("/<int:tool_order_id>", methods=["DELETE"])
+@token_required
+def delete_tool_order(tool_order_id):
+    """
+    Delete tool order
+    ---
+    tags:
+      - Tool Orders
+    security:
+      - Bearer: []
+    parameters:
+      - in: path
+        name: tool_order_id
+        type: integer
+        required: true
+    responses:
+      200:
+        description: Tool order successfully deleted
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+      401:
+        description: Unauthorized
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+      403:
+        description: Forbidden - insufficient permissions
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+      404:
+        description: Tool order not found
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+    """
+    order = ToolOrder.query.get(tool_order_id)
+
+    if not order:
+        return jsonify({"error": "Tool order not found"}), 404
+
+    current_user = request.current_user
+    if current_user.role not in [UserRole.maintainer, UserRole.maintenance_manager]:
+        return jsonify({"error": "Insufficient permissions"}), 403
+
+    if current_user.role == UserRole.maintainer and order.created_by_id != current_user.user_id:
+        return jsonify({"error": "Insufficient permissions"}), 403
+
+    db.session.delete(order)
+    db.session.commit()
+
+    return jsonify({"message": "Tool order deleted successfully"}), 200
 
 
 @tool_orders_bp.route("", methods=["POST"])
