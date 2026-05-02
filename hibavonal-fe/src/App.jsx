@@ -6,6 +6,7 @@ import Tickets from './pages/tickets/Tickets';
 import Login from './pages/login/Login';
 import Signup from './pages/signup/Signup';
 import ToolOrderForm from './pages/tool-order/ToolOrderForm';
+import ToolOrdersList from './pages/tool-orders/ToolOrdersList';
 import Rooms from './pages/rooms/Rooms';
 import AddTicketTypeForm from './pages/ticket-types/AddTicketTypeForm';
 
@@ -24,6 +25,14 @@ const App = () => {
         <Route path="/ticket-types/new" element={<AddTicketTypeForm />} />
         <Route path="/feedback/new" element={<StudentFeedbackForm />} />
         <Route path="/tools/new" element={<AddToolForm />} />
+        <Route
+          path="/tool-orders/list"
+          element={
+            <ProtectedRoute roles={['maintainer', 'maintenance_manager']}>
+              <ToolOrdersList />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/rooms"
           element={
