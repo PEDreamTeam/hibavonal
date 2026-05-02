@@ -1,7 +1,7 @@
 import enum
 
 from sqlalchemy import CheckConstraint
-from app import db
+from extensions import db
 
 class UserRole(enum.Enum):
     student = "student"

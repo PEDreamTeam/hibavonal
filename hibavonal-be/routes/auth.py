@@ -4,7 +4,7 @@ import jwt
 from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from app import db
+from extensions import db
 from models import User, UserRole
 from utils.auth import token_required
 

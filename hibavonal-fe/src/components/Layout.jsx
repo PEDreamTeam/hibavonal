@@ -51,18 +51,8 @@ const Layout = ({ children }) => {
 
   const menuItems = [{ label: 'Home', icon: <HomeIcon />, path: '/' }];
 
-  if (isAuthenticated && user?.role === 'admin') {
-    menuItems.push({
-      label: 'Rooms',
-      icon: <MeetingRoomIcon />,
-      path: '/rooms',
-    });
-  }
-
-  if (!isAuthenticated) {
+  if (isAuthenticated) {
     menuItems.push(
-      { label: 'Login', icon: <LoginIcon />, path: '/login' },
-      { label: 'Sign Up', icon: <PersonAddIcon />, path: '/signup' },
       { label: 'Tool order', icon: <BuildIcon />, path: '/tool-order' },
       {
         label: 'Add ticket type',
@@ -71,6 +61,19 @@ const Layout = ({ children }) => {
       },
       { label: 'Feedback', icon: <RateReviewIcon />, path: '/feedback/new' },
       { label: 'Add tool', icon: <HandymanIcon />, path: '/tools/new' }
+    );
+
+    if (user?.role === 'admin') {
+      menuItems.push({
+        label: 'Rooms',
+        icon: <MeetingRoomIcon />,
+        path: '/rooms',
+      });
+    }
+  } else {
+    menuItems.push(
+      { label: 'Login', icon: <LoginIcon />, path: '/login' },
+      { label: 'Sign Up', icon: <PersonAddIcon />, path: '/signup' }
     );
   }
 

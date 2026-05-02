@@ -48,13 +48,22 @@ export async function apiPost(url, body) {
     body: JSON.stringify(body),
   });
 
-  const data = await res.json();
+  let data = null;
+  try {
+    data = await res.json();
+  } catch (err) {
+    data = null;
+  }
 
   if (!res.ok) {
-    const error = new Error(data.error || 'API error');
+    const error = new Error(data?.error || `API error: ${res.status} ${res.statusText}`);
     error.status = res.status;
-    error.info = data;
+    error.info = data || { error: res.statusText };
     throw error;
+  }
+
+  if (data === null) {
+    throw new Error('Invalid JSON response from API');
   }
 
   return data;
