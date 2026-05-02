@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from models import db, ToolOrder, ToolOrderStatus, Tool, UserRole
 from utils.auth import token_required
+from routes.tool_orders_helpers import format_tool_order
 
 tool_orders_bp = Blueprint("tool_orders", __name__, url_prefix="/tool-orders")
 
