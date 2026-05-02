@@ -1,10 +1,89 @@
 from flask import Blueprint, jsonify, request
-from models import db, ToolOrder, ToolOrderStatus, Tool
+from models import db, ToolOrder, ToolOrderStatus, Tool, UserRole
+from utils.auth import token_required
 
 tool_orders_bp = Blueprint("tool_orders", __name__, url_prefix="/tool-orders")
 
 
+@tool_orders_bp.route("/list", methods=["GET"])
+@token_required
+def get_tool_orders_list():
+    """
+    Get list of tool orders with role-based filtering
+    ---
+    tags:
+      - Tool Orders
+    security:
+      - Bearer: []
+    responses:
+      200:
+        description: List of tool orders visible to user
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              tool_order_id:
+                type: integer
+              tool_name:
+                type: string
+              name:
+                type: string
+              details:
+                type: string
+                nullable: true
+              status:
+                type: string
+              created_by:
+                type: string
+              created_at:
+                type: string
+      401:
+        description: Unauthorized - invalid or missing token
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+      403:
+        description: Forbidden - insufficient permissions
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+    """
+    current_user = request.current_user
+
+    if current_user.role not in [UserRole.maintainer, UserRole.maintenance_manager]:
+        return jsonify({"error": "Insufficient permissions"}), 403
+
+    query = ToolOrder.query
+
+    if current_user.role == UserRole.maintainer:
+        query = query.filter_by(created_by_id=current_user.user_id)
+
+    tool_orders = query.all()
+
+    result = []
+    for order in tool_orders:
+        result.append(
+            {
+                "tool_order_id": order.tool_order_id,
+                "tool_name": order.tool.name if order.tool else None,
+                "name": order.name,
+                "details": order.details,
+                "status": order.status.value if order.status else None,
+                "created_by": order.created_by.username if order.created_by else None,
+                "created_at": order.created_at.isoformat() if order.created_at else None,
+            }
+        )
+
+    return jsonify(result), 200
+
+
 @tool_orders_bp.route("", methods=["GET"])
+@token_required
 def get_tool_orders():
     tool_orders = ToolOrder.query.all()
 
@@ -44,6 +123,7 @@ def get_tool_order(tool_order_id):
 
 
 @tool_orders_bp.route("", methods=["POST"])
+@token_required
 def create_tool_order():
     data = request.get_json()
 
@@ -75,6 +155,7 @@ def create_tool_order():
         name=name,
         details=details,
         status=status_enum,
+        created_by_id=request.current_user.user_id,
     )
 
     db.session.add(new_order)
