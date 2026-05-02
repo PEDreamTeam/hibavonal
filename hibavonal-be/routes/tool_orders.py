@@ -547,6 +547,8 @@ def create_tool_order():
         db.session.add(new_order)
         db.session.commit()
 
+        logger.info(f"Tool order created: ID={new_order.tool_order_id}, user={request.current_user.user_id}, name={name}")
+
         return jsonify(
             {
                 "message": "Tool order created successfully",
