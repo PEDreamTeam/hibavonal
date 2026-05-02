@@ -288,45 +288,117 @@ def delete_tool_order(tool_order_id):
 @tool_orders_bp.route("", methods=["POST"])
 @token_required
 def create_tool_order():
-    data = request.get_json()
-
-    if not data:
-        return jsonify({"error": "Missing JSON body"}), 400
-
-    tool_id = data.get("tool_id")
-    name = data.get("name")
-    details = data.get("details")
-    status = data.get("status", "ordered")
-
-    if not tool_id:
-        return jsonify({"error": "tool_id is required"}), 400
-
-    if not name:
-        return jsonify({"error": "name is required"}), 400
-
-    tool = Tool.query.get(tool_id)
-    if not tool:
-        return jsonify({"error": "Referenced tool does not exist"}), 400
-
+    """
+    Create a new tool order
+    ---
+    tags:
+      - Tool Orders
+    security:
+      - Bearer: []
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - tool_id
+            - name
+          properties:
+            tool_id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: "Order drill bits"
+            details:
+              type: string
+              nullable: true
+              example: "High-speed bits"
+            status:
+              type: string
+              enum: ["ordered", "ready"]
+              default: "ordered"
+              example: "ordered"
+    responses:
+      201:
+        description: Tool order created successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            tool_order_id:
+              type: integer
+      400:
+        description: Bad request - missing or invalid fields
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+      401:
+        description: Unauthorized
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+      500:
+        description: Internal server error
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+    """
     try:
-        status_enum = ToolOrderStatus(status)
-    except ValueError:
-        return jsonify({"error": "Invalid status"}), 400
+        data = request.get_json()
 
-    new_order = ToolOrder(
-        tool_id=tool_id,
-        name=name,
-        details=details,
-        status=status_enum,
-        created_by_id=request.current_user.user_id,
-    )
+        if not data:
+            return jsonify({"error": "Request body is required"}), 400
 
-    db.session.add(new_order)
-    db.session.commit()
+        tool_id = data.get("tool_id")
+        name = data.get("name")
+        details = data.get("details", "")
+        status = data.get("status", "ordered")
 
-    return jsonify(
-        {
-            "message": "Tool order created successfully",
-            "tool_order_id": new_order.tool_order_id,
-        }
-    ), 201
+        if not tool_id:
+            return jsonify({"error": "tool_id is required"}), 400
+
+        if not isinstance(tool_id, int):
+            return jsonify({"error": "tool_id must be an integer"}), 400
+
+        if not name or not isinstance(name, str) or len(name.strip()) == 0:
+            return jsonify({"error": "name is required and must be a non-empty string"}), 400
+
+        tool = Tool.query.get(tool_id)
+        if not tool:
+            return jsonify({"error": "Tool not found"}), 400
+
+        try:
+            status_enum = ToolOrderStatus(status)
+        except ValueError:
+            return jsonify({"error": f"Invalid status. Must be one of: {[s.value for s in ToolOrderStatus]}"}), 400
+
+        new_order = ToolOrder(
+            tool_id=tool_id,
+            name=name.strip(),
+            details=details.strip() if details else None,
+            status=status_enum,
+            created_by_id=request.current_user.user_id,
+        )
+
+        db.session.add(new_order)
+        db.session.commit()
+
+        return jsonify(
+            {
+                "message": "Tool order created successfully",
+                "tool_order_id": new_order.tool_order_id,
+            }
+        ), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
