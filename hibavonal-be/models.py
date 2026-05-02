@@ -1,4 +1,5 @@
 import enum
+from datetime import datetime
 
 from sqlalchemy import CheckConstraint
 from extensions import db
@@ -80,11 +81,14 @@ class ToolOrder(db.Model):
 
     tool_order_id = db.Column(db.Integer, primary_key=True)
     tool_id = db.Column(db.Integer, db.ForeignKey("tool.tool_id"), nullable=False)
+    created_by_id = db.Column(db.Integer, db.ForeignKey("user.user_id"), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     details = db.Column(db.String(255), nullable=True)
     status = db.Column(db.Enum(ToolOrderStatus), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     tool = db.relationship("Tool", back_populates="tool_orders")
+    created_by = db.relationship("User", foreign_keys=[created_by_id])
 
 class Ticket(db.Model):
     __tablename__ = "ticket"
