@@ -317,36 +317,48 @@ def update_tool_order(tool_order_id):
           properties:
             error:
               type: string
+      500:
+        description: Internal server error
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
     """
-    order = ToolOrder.query.get(tool_order_id)
-
-    if not order:
-        return jsonify({"error": "Tool order not found"}), 404
-
-    current_user = request.current_user
-    if current_user.role not in [UserRole.maintainer, UserRole.maintenance_manager]:
-        return jsonify({"error": "Insufficient permissions"}), 403
-
-    if current_user.role == UserRole.maintainer and order.created_by_id != current_user.user_id:
-        return jsonify({"error": "Insufficient permissions"}), 403
-
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "Request body is required"}), 400
-
-    status = data.get("status")
-    if not status:
-        return jsonify({"error": "Status is required"}), 400
-
     try:
-        status_enum = ToolOrderStatus(status)
-    except ValueError:
-        return jsonify({"error": f"Invalid status. Must be one of: {[s.value for s in ToolOrderStatus]}"}), 400
+        order = ToolOrder.query.get(tool_order_id)
 
-    order.status = status_enum
-    db.session.commit()
+        if not order:
+            return jsonify({"error": "Tool order not found"}), 404
 
-    return jsonify({"message": "Tool order updated successfully"}), 200
+        current_user = request.current_user
+        if current_user.role not in [UserRole.maintainer, UserRole.maintenance_manager]:
+            return jsonify({"error": "Insufficient permissions"}), 403
+
+        if current_user.role == UserRole.maintainer and order.created_by_id != current_user.user_id:
+            return jsonify({"error": "Insufficient permissions"}), 403
+
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Request body is required"}), 400
+
+        status = data.get("status")
+        if not status:
+            return jsonify({"error": "Status is required"}), 400
+
+        try:
+            status_enum = ToolOrderStatus(status)
+        except ValueError:
+            return jsonify({"error": f"Invalid status. Must be one of: {[s.value for s in ToolOrderStatus]}"}), 400
+
+        order.status = status_enum
+        db.session.commit()
+
+        return jsonify({"message": "Tool order updated successfully"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 
 @tool_orders_bp.route("/<int:tool_order_id>", methods=["DELETE"])
@@ -393,23 +405,35 @@ def delete_tool_order(tool_order_id):
           properties:
             error:
               type: string
+      500:
+        description: Internal server error
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
     """
-    order = ToolOrder.query.get(tool_order_id)
+    try:
+        order = ToolOrder.query.get(tool_order_id)
 
-    if not order:
-        return jsonify({"error": "Tool order not found"}), 404
+        if not order:
+            return jsonify({"error": "Tool order not found"}), 404
 
-    current_user = request.current_user
-    if current_user.role not in [UserRole.maintainer, UserRole.maintenance_manager]:
-        return jsonify({"error": "Insufficient permissions"}), 403
+        current_user = request.current_user
+        if current_user.role not in [UserRole.maintainer, UserRole.maintenance_manager]:
+            return jsonify({"error": "Insufficient permissions"}), 403
 
-    if current_user.role == UserRole.maintainer and order.created_by_id != current_user.user_id:
-        return jsonify({"error": "Insufficient permissions"}), 403
+        if current_user.role == UserRole.maintainer and order.created_by_id != current_user.user_id:
+            return jsonify({"error": "Insufficient permissions"}), 403
 
-    db.session.delete(order)
-    db.session.commit()
+        db.session.delete(order)
+        db.session.commit()
 
-    return jsonify({"message": "Tool order deleted successfully"}), 200
+        return jsonify({"message": "Tool order deleted successfully"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 
 @tool_orders_bp.route("", methods=["POST"])
