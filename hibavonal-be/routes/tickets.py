@@ -1,94 +1,86 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 
-from extensions import db
-from models import Ticket, TicketType, Room, User
-from utils.auth import token_required
+from app import db
+from models import Ticket
+from utils.auth import role_required
 
-tickets_bp = Blueprint("tickets", __name__)
+tickets_bp = Blueprint("tickets", __name__, url_prefix="/api/tickets")
 
 
 def ticket_to_dict(ticket):
     return {
         "ticket_id": ticket.ticket_id,
         "room_id": ticket.room_id,
+        "room_name": ticket.room.name if ticket.room else None,
         "student_id": ticket.student_id,
+        "student_username": ticket.student.username if ticket.student else None,
         "maintainer_id": ticket.maintainer_id,
+        "maintainer_username": ticket.maintainer.username if ticket.maintainer else None,
         "ticket_type_id": ticket.ticket_type_id,
+        "ticket_type_name": ticket.ticket_type.name if ticket.ticket_type else None,
         "details": ticket.details,
         "status": ticket.status.value,
         "priority": ticket.priority,
+        "is_deleted": ticket.is_deleted,
+        "feedback": {
+            "student_feedback_id": ticket.student_feedback.student_feedback_id,
+            "details": ticket.student_feedback.details,
+        } if ticket.student_feedback else None,
     }
 
 
-@tickets_bp.route("/create", methods=["POST"])
-@token_required
-def create_ticket():
+@tickets_bp.route("", methods=["GET"])
+@role_required("student")
+def get_student_tickets():
     """
-    Create a new ticket
+    Get all tickets for the authenticated student
     ---
     tags:
       - Tickets
     security:
       - Bearer: []
-    parameters:
-      - in: body
-        name: body
-        required: true
-        schema:
-          type: object
-          required:
-            - room_id
-            - ticket_type_id
-            - maintainer_id
-            - details
-            - priority
-          properties:
-            room_id:
-              type: integer
-              example: 1
-            ticket_type_id:
-              type: integer
-              example: 1
-            maintainer_id:
-              type: integer
-              example: 2
-            details:
-              type: string
-              example: "Door lock is broken"
-            priority:
-              type: integer
-              minimum: 0
-              maximum: 5
-              example: 3
     responses:
-      201:
-        description: Ticket successfully created
+      200:
+        description: List of tickets for the student
         schema:
-          type: object
-          properties:
-            ticket_id:
-              type: integer
-            room_id:
-              type: integer
-            student_id:
-              type: integer
-            maintainer_id:
-              type: integer
-            ticket_type_id:
-              type: integer
-            details:
-              type: string
-            status:
-              type: string
-            priority:
-              type: integer
-      400:
-        description: Bad request - missing or invalid required fields
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
+          type: array
+          items:
+            type: object
+            properties:
+              ticket_id:
+                type: integer
+              room_id:
+                type: integer
+              room_name:
+                type: string
+              student_id:
+                type: integer
+              student_username:
+                type: string
+              maintainer_id:
+                type: integer
+              maintainer_username:
+                type: string
+              ticket_type_id:
+                type: integer
+              ticket_type_name:
+                type: string
+              details:
+                type: string
+              status:
+                type: string
+              priority:
+                type: integer
+              is_deleted:
+                type: boolean
+              feedback:
+                type: object
+                nullable: true
+                properties:
+                  student_feedback_id:
+                    type: integer
+                  details:
+                    type: string
       401:
         description: Unauthorized - invalid or missing token
         schema:
@@ -97,64 +89,12 @@ def create_ticket():
             error:
               type: string
       403:
-        description: Forbidden - insufficient permissions
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      500:
-        description: Internal server error
+        description: Forbidden - insufficient permissions (student role required)
         schema:
           type: object
           properties:
             error:
               type: string
     """
-    try:
-        data = request.get_json()
-
-        if not data:
-            return jsonify({"error": "Request body is required"}), 400
-
-        room_id = data.get("room_id")
-        ticket_type_id = data.get("ticket_type_id")
-        maintainer_id = data.get("maintainer_id")
-        details = data.get("details")
-        priority = data.get("priority")
-
-        if not room_id or not ticket_type_id or not maintainer_id or not details or priority is None:
-            return jsonify({"error": "All fields are required: room_id, ticket_type_id, maintainer_id, details, priority"}), 400
-
-        if not isinstance(priority, int) or priority < 0 or priority > 5:
-            return jsonify({"error": "Priority must be an integer between 0 and 5"}), 400
-
-        room = Room.query.get(room_id)
-        if not room:
-            return jsonify({"error": "Room not found"}), 400
-
-        ticket_type = TicketType.query.get(ticket_type_id)
-        if not ticket_type:
-            return jsonify({"error": "Ticket type not found"}), 400
-
-        maintainer = User.query.get(maintainer_id)
-        if not maintainer:
-            return jsonify({"error": "Maintainer not found"}), 400
-
-        ticket = Ticket(
-            room_id=room_id,
-            student_id=request.current_user.user_id,
-            maintainer_id=maintainer_id,
-            ticket_type_id=ticket_type_id,
-            details=details,
-            priority=priority,
-        )
-
-        db.session.add(ticket)
-        db.session.commit()
-
-        return jsonify(ticket_to_dict(ticket)), 201
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+    tickets = Ticket.query.filter_by(student_id=request.current_user.user_id, is_deleted=False).all()
+    return jsonify([ticket_to_dict(t) for t in tickets]), 200

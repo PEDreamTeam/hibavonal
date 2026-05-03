@@ -237,6 +237,45 @@ def get_tool_orders():
 @tool_orders_bp.route("/<int:tool_order_id>", methods=["GET"])
 @token_required
 def get_tool_order(tool_order_id):
+    """
+    Get a single tool order by ID
+    ---
+    tags:
+      - ToolOrders
+    parameters:
+      - in: path
+        name: tool_order_id
+        type: integer
+        required: true
+        description: ID of the tool order to retrieve
+    responses:
+      200:
+        description: Tool order details
+        schema:
+          type: object
+          properties:
+            tool_order_id:
+              type: integer
+            tool_id:
+              type: integer
+            tool_name:
+              type: string
+              nullable: true
+            name:
+              type: string
+            details:
+              type: string
+              nullable: true
+            status:
+              type: string
+      404:
+        description: Tool order not found
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+    """
     order = ToolOrder.query.get(tool_order_id)
 
     if not order:
