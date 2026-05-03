@@ -9,9 +9,9 @@ import ToolOrderForm from './pages/tool-order/ToolOrderForm';
 import ToolOrdersList from './pages/tool-orders/ToolOrdersList';
 import Rooms from './pages/rooms/Rooms';
 import AddTicketTypeForm from './pages/ticket-types/AddTicketTypeForm';
-
 import StudentFeedbackForm from './pages/feedback/StudentFeedbackForm';
 import AddToolForm from './pages/tools/AddToolForm';
+import Settings from './pages/settings/Settings';
 
 const App = () => {
   return (
@@ -25,10 +25,13 @@ const App = () => {
         <Route path="/ticket-types/new" element={<AddTicketTypeForm />} />
         <Route path="/feedback/new" element={<StudentFeedbackForm />} />
         <Route path="/tools/new" element={<AddToolForm />} />
+        <Route path="/settings" element={<Settings />} />
         <Route
           path="/tool-orders/list"
           element={
-            <ProtectedRoute roles={['maintainer', 'maintenance_manager']}>
+            <ProtectedRoute
+              roles={['maintainer', 'maintenance_manager', 'admin']}
+            >
               <ToolOrdersList />
             </ProtectedRoute>
           }
@@ -36,7 +39,7 @@ const App = () => {
         <Route
           path="/rooms"
           element={
-            <ProtectedRoute roles={['admin']}>
+            <ProtectedRoute roles={['admin', 'maintainer', 'maintenance_manager']}>
               <Rooms />
             </ProtectedRoute>
           }

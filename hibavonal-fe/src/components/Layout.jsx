@@ -22,12 +22,11 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import { useNavigate } from 'react-router-dom';
 import useAppStore from '../store/useAppStore';
-import BuildIcon from '@mui/icons-material/Build';
 import CategoryIcon from '@mui/icons-material/Category';
-import RateReviewIcon from '@mui/icons-material/RateReview';
 import HandymanIcon from '@mui/icons-material/Handyman';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import StorageIcon from '@mui/icons-material/Storage';
+import SettingsIcon from '@mui/icons-material/Settings';
 const DRAWER_WIDTH = 250;
 
 const Layout = ({ children }) => {
@@ -53,31 +52,33 @@ const Layout = ({ children }) => {
   const menuItems = [{ label: 'Home', icon: <HomeIcon />, path: '/' }];
 
   if (isAuthenticated) {
-    menuItems.push(
-      { label: 'Tool order', icon: <BuildIcon />, path: '/tool-order' },
-      {
-        label: 'Add ticket type',
-        icon: <CategoryIcon />,
-        path: '/ticket-types/new',
-      },
-      { label: 'Feedback', icon: <RateReviewIcon />, path: '/feedback/new' },
-      { label: 'Add tool', icon: <HandymanIcon />, path: '/tools/new' }
-    );
-
-    if (user?.role === 'admin') {
-      menuItems.push({
-        label: 'Rooms',
-        icon: <MeetingRoomIcon />,
-        path: '/rooms',
-      });
+    if (user?.role === 'student') {
+      menuItems.push({ label: 'Settings', icon: <SettingsIcon />, path: '/settings' });
     }
 
     if (user?.role === 'maintainer' || user?.role === 'maintenance_manager') {
-      menuItems.push({
-        label: 'Tool Orders List',
-        icon: <StorageIcon />,
-        path: '/tool-orders/list',
-      });
+      menuItems.push(
+        { label: 'Rooms', icon: <MeetingRoomIcon />, path: '/rooms' },
+        { label: 'Tool Orders', icon: <StorageIcon />, path: '/tool-orders/list' }
+      );
+    }
+
+    if (user?.role === 'admin') {
+      menuItems.push(
+        {
+          label: 'Tool Orders',
+          icon: <StorageIcon />,
+          path: '/tool-orders/list',
+        },
+        { label: 'Add Tool', icon: <HandymanIcon />, path: '/tools/new' },
+        {
+          label: 'Add Ticket Type',
+          icon: <CategoryIcon />,
+          path: '/ticket-types/new',
+        },
+        { label: 'Rooms', icon: <MeetingRoomIcon />, path: '/rooms' },
+        { label: 'Settings', icon: <SettingsIcon />, path: '/settings' }
+      );
     }
   } else {
     menuItems.push(

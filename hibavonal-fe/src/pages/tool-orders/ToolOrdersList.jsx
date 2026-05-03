@@ -1,70 +1,34 @@
-import { useState, useEffect } from 'react';
 import {
+  Alert,
   Box,
+  Button,
+  Chip,
+  CircularProgress,
   Container,
-  Typography,
+  Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  Chip,
-  CircularProgress,
-  Alert,
+  Typography,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import useAppStore from '../../store/useAppStore';
+import useToolOrdersList from '../../api/hooks/useToolOrdersList';
 
 const ToolOrdersList = () => {
-  const [toolOrders, setToolOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const { user } = useAppStore();
+  const navigate = useNavigate();
+  const { toolOrders, isLoading, error } = useToolOrdersList();
 
-  useEffect(() => {
-    const fetchToolOrders = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/tool-orders/list', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
+  const canOrderTool = user?.role === 'maintainer' || user?.role === 'maintenance_manager';
+  const isAdmin = user?.role === 'admin';
 
-        if (!response.ok) {
-          if (response.status === 403) {
-            setError('You do not have permission to view tool orders');
-          } else {
-            throw new Error(`Failed to fetch tool orders: ${response.status}`);
-          }
-          setLoading(false);
-          return;
-        }
-
-        const data = await response.json();
-        setToolOrders(data);
-        setError(null);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchToolOrders();
-  }, []);
-
-  const getStatusColor = (status) => {
-    return status === 'ordered' ? 'warning' : 'success';
-  };
-
-  const getStatusLabel = (status) => {
-    return status === 'ordered' ? 'Ordered' : 'Ready';
-  };
+  const getStatusColor = (status) => (status === 'ordered' ? 'warning' : 'success');
+  const getStatusLabel = (status) => (status === 'ordered' ? 'Ordered' : 'Ready');
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -77,7 +41,7 @@ const ToolOrdersList = () => {
     });
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Container maxWidth="lg">
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
@@ -90,15 +54,21 @@ const ToolOrdersList = () => {
   return (
     <Container maxWidth="lg">
       <Box sx={{ py: 4 }}>
-        <Typography variant="h4" sx={{ mb: 3 }}>
-          Tool Orders
-        </Typography>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+          <Typography variant="h4">Tool Orders</Typography>
+          {canOrderTool && (
+            <Button variant="contained" onClick={() => navigate('/tool-order')}>
+              Tool Order
+            </Button>
+          )}
+          {isAdmin && (
+            <Button variant="contained" onClick={() => navigate('/tools/new')}>
+              Add Tool
+            </Button>
+          )}
+        </Stack>
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
         {!error && toolOrders.length === 0 && (
           <Alert severity="info">No tool orders found</Alert>

@@ -1,216 +1,195 @@
 import { useMemo, useState } from 'react';
 import {
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Container,
-    Divider,
-    IconButton,
-    List,
-    ListItem,
-    ListItemText,
-    Menu,
-    MenuItem,
-    Stack,
-    Typography,
-    Chip,
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  CircularProgress,
+  Divider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Stack,
+  Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-
-const mockTickets = [
-    {
-        id: 1,
-        ticketName: 'Broken lamp',
-        maintainerName: 'John Doe',
-        roomName: 'A102',
-        date: '2026-04-03',
-        status: 'in_progress',
-    },
-    {
-        id: 2,
-        ticketName: 'Window issue',
-        maintainerName: 'Jane Smith',
-        roomName: 'B210',
-        date: '2026-04-02',
-        status: 'ready_to_done',
-    },
-    {
-        id: 3,
-        ticketName: 'Heating problem',
-        maintainerName: 'John Doe',
-        roomName: 'C011',
-        date: '2026-04-01',
-        status: 'done',
-    },
-];
-
-
+import useAppStore from '../../store/useAppStore';
+import useTickets from '../../api/hooks/useTickets';
+import CreateTicketDialog from './CreateTicketDialog';
+import EditStatusDialog from './EditStatusDialog';
 
 const statusLabels = {
-    in_progress: 'In progress',
-    ready_to_done: 'Ready to done',
-    done: 'Done',
+  in_progress: 'In progress',
+  ready_to_done: 'Ready to done',
+  done: 'Done',
 };
 
-const TicketItem = ({ ticket }) => {
-    const [anchorEl, setAnchorEl] = useState(null);
-    const open = Boolean(anchorEl);
+function TicketItem({ ticket, canEditStatus, onEditStatus }) {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
 
-    const handleMenuOpen = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-
-    return (
-        <>
-            <ListItem
-                secondaryAction={
-                    <>
-                        <IconButton edge="end" onClick={handleMenuOpen}>
-                            <MoreVertIcon />
-                        </IconButton>
-                        <Menu anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
-                            <MenuItem onClick={handleMenuClose}>Edit</MenuItem>
-                            <MenuItem onClick={handleMenuClose}>Archive</MenuItem>
-                            <MenuItem onClick={handleMenuClose}>Give feedback</MenuItem>
-                        </Menu>
-                    </>
-                }
-            >
-                <ListItemText
-                    primary={ticket.ticketName}
-                    secondary={`Maintainer: ${ticket.maintainerName} | Room: ${ticket.roomName} | Date: ${ticket.date}`}
-                />
-            </ListItem>
-        </>
-    );
+  return (
+    <>
+      <ListItem
+        secondaryAction={
+          <>
+            <IconButton edge="end" onClick={(e) => setAnchorEl(e.currentTarget)}>
+              <MoreVertIcon />
+            </IconButton>
+            <Menu anchorEl={anchorEl} open={open} onClose={() => setAnchorEl(null)}>
+              {canEditStatus && (
+                <MenuItem onClick={() => { setAnchorEl(null); onEditStatus(ticket); }}>
+                  Edit status
+                </MenuItem>
+              )}
+              <MenuItem onClick={() => setAnchorEl(null)}>Archive</MenuItem>
+              <MenuItem onClick={() => setAnchorEl(null)}>Give feedback</MenuItem>
+            </Menu>
+          </>
+        }
+      >
+        <ListItemText
+          primary={ticket.ticketName}
+          secondary={`Maintainer: ${ticket.maintainerName} | Room: ${ticket.roomName}`}
+        />
+      </ListItem>
+    </>
+  );
 }
 
-function TicketRow({ ticket }) {
-    return (
-        <ListItem>
-            <ListItemText
-                primary={ticket.ticketName}
-                secondary={`Maintainer: ${ticket.maintainerName} | Room: ${ticket.roomName} | Date: ${ticket.date}`}
+function TicketGroup({ title, tickets, canEditStatus, onEditStatus }) {
+  if (!tickets.length) return null;
+  return (
+    <Card sx={{ mb: 3, width: '100%', maxWidth: 720, mx: 'auto' }}>
+      <CardContent>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+          <Typography variant="h6">{title}</Typography>
+          <Chip label={tickets.length} />
+        </Stack>
+        <Divider sx={{ mb: 1 }} />
+        <List>
+          {tickets.map((ticket) => (
+            <TicketItem
+              key={ticket.id}
+              ticket={ticket}
+              canEditStatus={canEditStatus}
+              onEditStatus={onEditStatus}
             />
-        </ListItem>
-    );
+          ))}
+        </List>
+      </CardContent>
+    </Card>
+  );
 }
 
-function TicketGroup({ title, tickets }) {
-    if (!tickets.length) return null;
-
-    return (
-       <Card
-             sx={{
-                mb: 3,
-                width: '100%',
-                maxWidth: 720,
-                mx: 'auto',
-                }}
-                >
-            <CardContent>
-                <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    sx={{ mb: 2 }}
-                >
-                    <Typography variant="h6">{title}</Typography>
-                    <Chip label={tickets.length} />
-                </Stack>
-                <Divider sx={{ mb: 1 }} />
-                <List>
-                    {tickets.map((ticket) => (
-                        <TicketRow key={ticket.id} ticket={ticket} />
-                    ))}
-                </List>
-            </CardContent>
-        </Card>
-    );
+function mapTicket(t) {
+  return {
+    id: t.ticket_id,
+    ticketName: t.details,
+    maintainerName: t.maintainer_username || 'N/A',
+    roomName: t.room_name || 'N/A',
+    status: t.status,
+  };
 }
 
 export default function Tickets() {
-    const tickets = mockTickets;
+  const [createOpen, setCreateOpen] = useState(false);
+  const [editTicket, setEditTicket] = useState(null);
 
-    const groupedTickets = useMemo(() => {
-        return {
-            in_progress: tickets.filter((ticket) => ticket.status === 'in_progress'),
-            ready_to_done: tickets.filter((ticket) => ticket.status === 'ready_to_done'),
-            done: tickets.filter((ticket) => ticket.status === 'done'),
-        };
-    }, [tickets]);
+  const { user } = useAppStore();
+  const { tickets: raw, isLoading, error } = useTickets();
 
-    const hasTickets = tickets.length > 0;
+  const canEditStatus = user?.role === 'maintenance_manager' || user?.role === 'admin';
+  const isStudent = user?.role === 'student';
 
+  const tickets = useMemo(() => raw.map(mapTicket), [raw]);
+
+  const groupedTickets = useMemo(() => ({
+    in_progress: tickets.filter((t) => t.status === 'in_progress'),
+    ready_to_done: tickets.filter((t) => t.status === 'ready_to_done'),
+    done: tickets.filter((t) => t.status === 'done'),
+  }), [tickets]);
+
+  if (isLoading) {
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: '100vh',
-                width: '100%',
-                maxWidth: 720,
-                mx: 'auto',
-                py: 4,
-                backgroundColor: '#fafafa'
-            }}
-        >
-           
-            <Box sx={{ width: '100%', px: 2 }}>
-                <Stack spacing={3}>
-                    
-                    <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                    >
-                        <Typography variant="h4" fontWeight="bold">Tickets</Typography>
-                        <Button 
-                            variant="contained" 
-                            color="error" 
-                            startIcon={<AddIcon />}
-                            sx={{ borderRadius: 2 }}
-                        >
-                            Create ticket
-                        </Button>
-                    </Stack>
-
-                    {!hasTickets ? (
-                        <Card sx={{ width: '100%', textAlign: 'center', py: 5 }}>
-                            <CardContent>
-                                <Typography variant="h6" gutterBottom>No tickets yet</Typography>
-                                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                                    There are no tickets related to this user yet.
-                                </Typography>
-                                <Button variant="contained">Create one</Button>
-                            </CardContent>
-                        </Card>
-                    ) : (
-                        <Box>
-                            <TicketGroup
-                                title={statusLabels.in_progress}
-                                tickets={groupedTickets.in_progress}
-                            />
-                            <TicketGroup
-                                title={statusLabels.ready_to_done}
-                                tickets={groupedTickets.ready_to_done}
-                            />
-                            <TicketGroup 
-                                title={statusLabels.done} 
-                                tickets={groupedTickets.done} 
-                            />
-                        </Box>
-                    )}
-                </Stack>
-            </Box>
-        </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
+        <CircularProgress />
+      </Box>
     );
+  }
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: 720, mx: 'auto', py: 4 }}>
+      <Box sx={{ width: '100%', px: 2 }}>
+        <Stack spacing={3}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Typography variant="h4" fontWeight="bold">Tickets</Typography>
+            {isStudent && (
+              <Button
+                variant="contained"
+                color="error"
+                startIcon={<AddIcon />}
+                sx={{ borderRadius: 2 }}
+                onClick={() => setCreateOpen(true)}
+              >
+                Create ticket
+              </Button>
+            )}
+          </Stack>
+
+          {error && <Alert severity="error">{error}</Alert>}
+
+          {!error && tickets.length === 0 ? (
+            <Card sx={{ width: '100%', textAlign: 'center', py: 5 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>No tickets yet</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  There are no tickets related to this user yet.
+                </Typography>
+                {isStudent && (
+                  <Button variant="contained" onClick={() => setCreateOpen(true)}>
+                    Create one
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          ) : (
+            <Box>
+              <TicketGroup
+                title={statusLabels.in_progress}
+                tickets={groupedTickets.in_progress}
+                canEditStatus={canEditStatus}
+                onEditStatus={setEditTicket}
+              />
+              <TicketGroup
+                title={statusLabels.ready_to_done}
+                tickets={groupedTickets.ready_to_done}
+                canEditStatus={canEditStatus}
+                onEditStatus={setEditTicket}
+              />
+              <TicketGroup
+                title={statusLabels.done}
+                tickets={groupedTickets.done}
+                canEditStatus={canEditStatus}
+                onEditStatus={setEditTicket}
+              />
+            </Box>
+          )}
+        </Stack>
+      </Box>
+
+      <CreateTicketDialog open={createOpen} onClose={() => setCreateOpen(false)} />
+      <EditStatusDialog
+        open={!!editTicket}
+        ticket={editTicket}
+        onClose={() => setEditTicket(null)}
+      />
+    </Box>
+  );
 }

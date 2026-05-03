@@ -16,7 +16,7 @@ def room_to_dict(room):
 
 
 @rooms_bp.route("", methods=["GET"])
-@role_required("admin")
+@role_required("admin", "maintainer", "maintenance_manager", "student")
 def get_rooms():
     """
     Get all rooms
