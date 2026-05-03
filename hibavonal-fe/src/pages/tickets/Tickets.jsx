@@ -48,7 +48,8 @@ function TicketItem({
   const STATUS_ORDER = ['created', 'in_progress', 'ready_to_done', 'done'];
   const showStatusAction =
     statusAction &&
-    STATUS_ORDER.indexOf(ticket.status) < STATUS_ORDER.indexOf(statusAction.status);
+    STATUS_ORDER.indexOf(ticket.status) <
+      STATUS_ORDER.indexOf(statusAction.status);
 
   return (
     <ListItem
@@ -58,25 +59,43 @@ function TicketItem({
             <MoreVertIcon />
           </IconButton>
           <Menu anchorEl={anchorEl} open={open} onClose={close}>
-            <MenuItem onClick={() => { close(); onViewDetails(ticket); }}>
+            <MenuItem
+              onClick={() => {
+                close();
+                onViewDetails(ticket);
+              }}
+            >
               View details
             </MenuItem>
             {showStatusAction && (
-              <MenuItem onClick={() => { close(); onMarkStatus(ticket, statusAction.status); }}>
+              <MenuItem
+                onClick={() => {
+                  close();
+                  onMarkStatus(ticket, statusAction.status);
+                }}
+              >
                 {statusAction.label}
               </MenuItem>
             )}
-            <MenuItem onClick={() => { close(); onShowFeedbacks(ticket); }}>
+            <MenuItem
+              onClick={() => {
+                close();
+                onShowFeedbacks(ticket);
+              }}
+            >
               Show feedbacks
             </MenuItem>
             {isStudent && (
-              <MenuItem onClick={() => { close(); onShowFeedbacks(ticket); }}>
+              <MenuItem
+                onClick={() => {
+                  close();
+                  onShowFeedbacks(ticket);
+                }}
+              >
                 Give feedback
               </MenuItem>
             )}
-            {!isStudent && (
-              <MenuItem onClick={close}>Archive</MenuItem>
-            )}
+            {!isStudent && <MenuItem onClick={close}>Archive</MenuItem>}
           </Menu>
         </>
       }
@@ -164,7 +183,9 @@ export default function Tickets() {
     try {
       await updateTicketStatus(ticket.id, status);
     } catch (err) {
-      setStatusError(err?.info?.error || err?.message || 'Failed to update status');
+      setStatusError(
+        err?.info?.error || err?.message || 'Failed to update status'
+      );
     }
   };
 
@@ -232,7 +253,10 @@ export default function Tickets() {
           </Stack>
 
           {(error || statusError) && (
-            <Alert severity="error" onClose={statusError ? () => setStatusError(null) : undefined}>
+            <Alert
+              severity="error"
+              onClose={statusError ? () => setStatusError(null) : undefined}
+            >
               {error || statusError}
             </Alert>
           )}
@@ -262,10 +286,26 @@ export default function Tickets() {
             </Card>
           ) : (
             <Box>
-              <TicketGroup title={statusLabels.created} tickets={groupedTickets.created} {...groupProps} />
-              <TicketGroup title={statusLabels.in_progress} tickets={groupedTickets.in_progress} {...groupProps} />
-              <TicketGroup title={statusLabels.ready_to_done} tickets={groupedTickets.ready_to_done} {...groupProps} />
-              <TicketGroup title={statusLabels.done} tickets={groupedTickets.done} {...groupProps} />
+              <TicketGroup
+                title={statusLabels.created}
+                tickets={groupedTickets.created}
+                {...groupProps}
+              />
+              <TicketGroup
+                title={statusLabels.in_progress}
+                tickets={groupedTickets.in_progress}
+                {...groupProps}
+              />
+              <TicketGroup
+                title={statusLabels.ready_to_done}
+                tickets={groupedTickets.ready_to_done}
+                {...groupProps}
+              />
+              <TicketGroup
+                title={statusLabels.done}
+                tickets={groupedTickets.done}
+                {...groupProps}
+              />
             </Box>
           )}
         </Stack>

@@ -29,7 +29,9 @@ const App = () => {
         <Route
           path="/tools"
           element={
-            <ProtectedRoute roles={['maintainer', 'maintenance_manager', 'admin']}>
+            <ProtectedRoute
+              roles={['maintainer', 'maintenance_manager', 'admin']}
+            >
               <ToolsList />
             </ProtectedRoute>
           }
@@ -45,7 +47,9 @@ const App = () => {
         <Route
           path="/tool-orders/list"
           element={
-            <ProtectedRoute roles={['maintainer', 'maintenance_manager', 'admin']}>
+            <ProtectedRoute
+              roles={['maintainer', 'maintenance_manager', 'admin']}
+            >
               <ToolOrdersList />
             </ProtectedRoute>
           }
@@ -53,7 +57,9 @@ const App = () => {
         <Route
           path="/rooms"
           element={
-            <ProtectedRoute roles={['admin', 'maintainer', 'maintenance_manager']}>
+            <ProtectedRoute
+              roles={['admin', 'maintainer', 'maintenance_manager']}
+            >
               <Rooms />
             </ProtectedRoute>
           }

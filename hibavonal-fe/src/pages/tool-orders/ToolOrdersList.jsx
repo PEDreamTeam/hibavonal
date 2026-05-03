@@ -87,7 +87,7 @@ const ToolOrdersList = () => {
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
-                <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                <TableRow sx={{ backgroundColor: 'action.hover' }}>
                   <TableCell>Tool Name</TableCell>
                   <TableCell>Order Name</TableCell>
                   <TableCell>Status</TableCell>

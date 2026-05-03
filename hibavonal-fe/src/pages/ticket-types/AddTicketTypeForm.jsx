@@ -16,12 +16,13 @@ import {
   Typography,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { apiPost } from '../../api/fetcher';
 import useTools from '../../api/hooks/useTools';
+import useTicketTypes from '../../api/hooks/useTicketTypes';
 
 export default function AddTicketTypeForm() {
   const navigate = useNavigate();
   const { tools, isLoading: toolsLoading } = useTools();
+  const { createTicketType } = useTicketTypes();
 
   const [formData, setFormData] = useState({ name: '', details: '' });
   const [selectedToolIds, setSelectedToolIds] = useState([]);
@@ -46,7 +47,7 @@ export default function AddTicketTypeForm() {
     setError(null);
     setSubmitting(true);
     try {
-      await apiPost('/api/ticket-types', {
+      await createTicketType({
         name: formData.name,
         details: formData.details || undefined,
         tool_ids: selectedToolIds,

@@ -34,9 +34,10 @@ export default function CreateTicketDialog({ open, onClose }) {
   const { currentUser } = useCurrentUser();
   const { user } = useAppStore();
 
-  const rooms = user?.role === 'student' && currentUser?.room_id
-    ? allRooms.filter((r) => r.room_id === currentUser.room_id)
-    : allRooms;
+  const rooms =
+    user?.role === 'student' && currentUser?.room_id
+      ? allRooms.filter((r) => r.room_id === currentUser.room_id)
+      : allRooms;
 
   const set = (field) => (e) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));

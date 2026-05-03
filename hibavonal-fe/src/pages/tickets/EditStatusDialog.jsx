@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   Button,
@@ -27,16 +27,17 @@ export default function EditStatusDialog({ open, ticket, userRole, onClose }) {
 
   const { updateTicketStatus } = useTickets();
 
-  const statusOptions =
-    userRole === 'maintainer'
-      ? STATUS_OPTIONS_MAINTAINER
-      : STATUS_OPTIONS_MANAGER;
+  const statusOptions = useMemo(
+    () =>
+      userRole === 'maintainer' ? STATUS_OPTIONS_MAINTAINER : STATUS_OPTIONS_MANAGER,
+    [userRole]
+  );
 
   useEffect(() => {
     if (ticket && statusOptions.length > 0) {
       setStatus(statusOptions[0].value);
     }
-  }, [ticket, userRole]);
+  }, [ticket, statusOptions]);
 
   const handleSubmit = async () => {
     setSubmitting(true);

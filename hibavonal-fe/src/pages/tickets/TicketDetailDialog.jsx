@@ -98,7 +98,12 @@ function ToolRemoveButton({ ticketId, toolId, onError }) {
 
 export default function TicketDetailDialog({ open, ticketId, onClose }) {
   const { user } = useAppStore();
-  const { ticket, isLoading, error, mutate: mutateTicket } = useTicket(open ? ticketId : null);
+  const {
+    ticket,
+    isLoading,
+    error,
+    mutate: mutateTicket,
+  } = useTicket(open ? ticketId : null);
   const { tools: allTools } = useTools();
   const { ticketTypes } = useTicketTypes();
   const { maintainers } = useMaintainers();

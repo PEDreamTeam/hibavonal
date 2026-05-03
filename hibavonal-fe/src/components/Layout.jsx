@@ -53,22 +53,39 @@ const Layout = ({ children }) => {
 
   if (isAuthenticated) {
     if (user?.role === 'student') {
-      menuItems.push({ label: 'Settings', icon: <SettingsIcon />, path: '/settings' });
+      menuItems.push({
+        label: 'Settings',
+        icon: <SettingsIcon />,
+        path: '/settings',
+      });
     }
 
     if (user?.role === 'maintainer' || user?.role === 'maintenance_manager') {
       menuItems.push(
         { label: 'Rooms', icon: <MeetingRoomIcon />, path: '/rooms' },
         { label: 'Tools', icon: <HandymanIcon />, path: '/tools' },
-        { label: 'Tool Orders', icon: <StorageIcon />, path: '/tool-orders/list' }
+        {
+          label: 'Tool Orders',
+          icon: <StorageIcon />,
+          path: '/tool-orders/list',
+        },
+        { label: 'Settings', icon: <SettingsIcon />, path: '/settings' }
       );
     }
 
     if (user?.role === 'admin') {
       menuItems.push(
-        { label: 'Tool Orders', icon: <StorageIcon />, path: '/tool-orders/list' },
+        {
+          label: 'Tool Orders',
+          icon: <StorageIcon />,
+          path: '/tool-orders/list',
+        },
         { label: 'Tools', icon: <HandymanIcon />, path: '/tools' },
-        { label: 'Add Ticket Type', icon: <CategoryIcon />, path: '/ticket-types/new' },
+        {
+          label: 'Add Ticket Type',
+          icon: <CategoryIcon />,
+          path: '/ticket-types/new',
+        },
         { label: 'Rooms', icon: <MeetingRoomIcon />, path: '/rooms' },
         { label: 'Settings', icon: <SettingsIcon />, path: '/settings' }
       );

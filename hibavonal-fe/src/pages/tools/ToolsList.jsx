@@ -66,7 +66,7 @@ export default function ToolsList() {
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
-                <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                <TableRow sx={{ backgroundColor: 'action.hover' }}>
                   <TableCell>#</TableCell>
                   <TableCell>Name</TableCell>
                 </TableRow>
