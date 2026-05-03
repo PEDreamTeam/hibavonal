@@ -1,21 +1,23 @@
 from flask import Flask, jsonify
 from flasgger import Swagger
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 from flask_cors import CORS
 import os
+from pathlib import Path
+
+from extensions import db, migrate
 
 app = Flask(__name__)
 
+BASE_DIR = Path(__file__).resolve().parent
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
     "DATABASE_URL",
-    "sqlite:///hibavonal.db"
+    f"sqlite:///{(BASE_DIR / 'instance' / 'hibavonal.db').as_posix()}"
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
 
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+db.init_app(app)
+migrate.init_app(app, db)
 
 CORS(app, origins=["http://localhost:5173"])
 

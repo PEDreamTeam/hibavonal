@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 
-from app import db
+from extensions import db
 from models import Ticket
 from utils.auth import role_required
 

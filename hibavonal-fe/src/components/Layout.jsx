@@ -27,6 +27,7 @@ import CategoryIcon from '@mui/icons-material/Category';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import HandymanIcon from '@mui/icons-material/Handyman';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import StorageIcon from '@mui/icons-material/Storage';
 const DRAWER_WIDTH = 250;
 
 const Layout = ({ children }) => {
@@ -51,18 +52,8 @@ const Layout = ({ children }) => {
 
   const menuItems = [{ label: 'Home', icon: <HomeIcon />, path: '/' }];
 
-  if (isAuthenticated && user?.role === 'admin') {
-    menuItems.push({
-      label: 'Rooms',
-      icon: <MeetingRoomIcon />,
-      path: '/rooms',
-    });
-  }
-
-  if (!isAuthenticated) {
+  if (isAuthenticated) {
     menuItems.push(
-      { label: 'Login', icon: <LoginIcon />, path: '/login' },
-      { label: 'Sign Up', icon: <PersonAddIcon />, path: '/signup' },
       { label: 'Tool order', icon: <BuildIcon />, path: '/tool-order' },
       {
         label: 'Add ticket type',
@@ -71,6 +62,27 @@ const Layout = ({ children }) => {
       },
       { label: 'Feedback', icon: <RateReviewIcon />, path: '/feedback/new' },
       { label: 'Add tool', icon: <HandymanIcon />, path: '/tools/new' }
+    );
+
+    if (user?.role === 'admin') {
+      menuItems.push({
+        label: 'Rooms',
+        icon: <MeetingRoomIcon />,
+        path: '/rooms',
+      });
+    }
+
+    if (user?.role === 'maintainer' || user?.role === 'maintenance_manager') {
+      menuItems.push({
+        label: 'Tool Orders List',
+        icon: <StorageIcon />,
+        path: '/tool-orders/list',
+      });
+    }
+  } else {
+    menuItems.push(
+      { label: 'Login', icon: <LoginIcon />, path: '/login' },
+      { label: 'Sign Up', icon: <PersonAddIcon />, path: '/signup' }
     );
   }
 
