@@ -17,16 +17,12 @@ import {
 } from '@mui/material';
 import useTickets from '../../api/hooks/useTickets';
 import useRooms from '../../api/hooks/useRooms';
-import useTicketTypes from '../../api/hooks/useTicketTypes';
-import useMaintainers from '../../api/hooks/useMaintainers';
 import useCurrentUser from '../../api/hooks/useCurrentUser';
 import useAppStore from '../../store/useAppStore';
 
 export default function CreateTicketDialog({ open, onClose }) {
   const [form, setForm] = useState({
     room_id: '',
-    ticket_type_id: '',
-    maintainer_id: '',
     details: '',
     priority: 3,
   });
@@ -35,8 +31,6 @@ export default function CreateTicketDialog({ open, onClose }) {
 
   const { createTicket } = useTickets();
   const { rooms: allRooms } = useRooms();
-  const { ticketTypes } = useTicketTypes();
-  const { maintainers } = useMaintainers();
   const { currentUser } = useCurrentUser();
   const { user } = useAppStore();
 
@@ -53,8 +47,6 @@ export default function CreateTicketDialog({ open, onClose }) {
     try {
       await createTicket({
         room_id: Number(form.room_id),
-        ticket_type_id: Number(form.ticket_type_id),
-        maintainer_id: Number(form.maintainer_id),
         details: form.details,
         priority: form.priority,
       });
@@ -67,22 +59,12 @@ export default function CreateTicketDialog({ open, onClose }) {
   };
 
   const handleClose = () => {
-    setForm({
-      room_id: '',
-      ticket_type_id: '',
-      maintainer_id: '',
-      details: '',
-      priority: 3,
-    });
+    setForm({ room_id: '', details: '', priority: 3 });
     setError(null);
     onClose();
   };
 
-  const isValid =
-    form.room_id &&
-    form.ticket_type_id &&
-    form.maintainer_id &&
-    form.details.trim();
+  const isValid = form.room_id && form.details.trim();
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
@@ -97,36 +79,6 @@ export default function CreateTicketDialog({ open, onClose }) {
               {rooms.map((r) => (
                 <MenuItem key={r.room_id} value={r.room_id}>
                   {r.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth>
-            <InputLabel>Ticket Type</InputLabel>
-            <Select
-              value={form.ticket_type_id}
-              label="Ticket Type"
-              onChange={set('ticket_type_id')}
-            >
-              {ticketTypes.map((t) => (
-                <MenuItem key={t.ticket_type_id} value={t.ticket_type_id}>
-                  {t.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth>
-            <InputLabel>Maintainer</InputLabel>
-            <Select
-              value={form.maintainer_id}
-              label="Maintainer"
-              onChange={set('maintainer_id')}
-            >
-              {maintainers.map((m) => (
-                <MenuItem key={m.user_id} value={m.user_id}>
-                  {m.username}
                 </MenuItem>
               ))}
             </Select>

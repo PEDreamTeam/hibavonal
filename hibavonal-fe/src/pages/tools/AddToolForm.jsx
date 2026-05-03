@@ -1,31 +1,38 @@
 import { useState } from 'react';
 import {
+  Alert,
   Box,
   Button,
   Card,
   CardContent,
+  CircularProgress,
   Container,
   Stack,
   TextField,
   Typography,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import useTools from '../../api/hooks/useTools';
 
 export default function AddToolForm() {
-  const [formData, setFormData] = useState({
-    name: '',
-  });
+  const navigate = useNavigate();
+  const { createTool } = useTools();
+  const [name, setName] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log('New tool submitted:', formData);
+    setError(null);
+    setSubmitting(true);
+    try {
+      await createTool({ name });
+      navigate('/tools');
+    } catch (err) {
+      setError(err?.info?.error || err?.message || 'Failed to add tool');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -37,20 +44,35 @@ export default function AddToolForm() {
               Add New Tool
             </Typography>
 
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+
             <Box component="form" onSubmit={handleSubmit}>
               <Stack spacing={3}>
                 <TextField
                   label="Tool name"
                   name="name"
-                  value={formData.name}
-                  onChange={handleChange}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   fullWidth
                   required
                 />
-
-                <Stack direction="row" justifyContent="flex-end">
-                  <Button type="submit" variant="contained">
-                    Add tool
+                <Stack direction="row" justifyContent="flex-end" spacing={1}>
+                  <Button
+                    onClick={() => navigate('/tools')}
+                    disabled={submitting}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={submitting || !name.trim()}
+                  >
+                    {submitting ? <CircularProgress size={20} /> : 'Add tool'}
                   </Button>
                 </Stack>
               </Stack>

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Alert,
   Box,
@@ -15,20 +16,22 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import useAppStore from '../../store/useAppStore';
 import useToolOrdersList from '../../api/hooks/useToolOrdersList';
+import ToolOrderDialog from './ToolOrderDialog';
 
 const ToolOrdersList = () => {
   const { user } = useAppStore();
-  const navigate = useNavigate();
   const { toolOrders, isLoading, error } = useToolOrdersList();
+  const [dialogOpen, setDialogOpen] = useState(false);
 
-  const canOrderTool = user?.role === 'maintainer' || user?.role === 'maintenance_manager';
-  const isAdmin = user?.role === 'admin';
+  const canOrderTool =
+    user?.role === 'maintenance_manager' || user?.role === 'admin';
 
-  const getStatusColor = (status) => (status === 'ordered' ? 'warning' : 'success');
-  const getStatusLabel = (status) => (status === 'ordered' ? 'Ordered' : 'Ready');
+  const getStatusColor = (status) =>
+    status === 'ordered' ? 'warning' : 'success';
+  const getStatusLabel = (status) =>
+    status === 'ordered' ? 'Ordered' : 'Ready';
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -54,21 +57,27 @@ const ToolOrdersList = () => {
   return (
     <Container maxWidth="lg">
       <Box sx={{ py: 4 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ mb: 3 }}
+        >
           <Typography variant="h4">Tool Orders</Typography>
-          {canOrderTool && (
-            <Button variant="contained" onClick={() => navigate('/tool-order')}>
-              Tool Order
-            </Button>
-          )}
-          {isAdmin && (
-            <Button variant="contained" onClick={() => navigate('/tools/new')}>
-              Add Tool
-            </Button>
-          )}
+          <Stack direction="row" spacing={1}>
+            {canOrderTool && (
+              <Button variant="contained" onClick={() => setDialogOpen(true)}>
+                Order a new tool
+              </Button>
+            )}
+          </Stack>
         </Stack>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         {!error && toolOrders.length === 0 && (
           <Alert severity="info">No tool orders found</Alert>
@@ -102,7 +111,13 @@ const ToolOrdersList = () => {
                     </TableCell>
                     <TableCell>{order.created_by || 'N/A'}</TableCell>
                     <TableCell>{formatDate(order.created_at)}</TableCell>
-                    <TableCell sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <TableCell
+                      sx={{
+                        maxWidth: 200,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
                       {order.details || '-'}
                     </TableCell>
                   </TableRow>
@@ -112,6 +127,8 @@ const ToolOrdersList = () => {
           </TableContainer>
         )}
       </Box>
+
+      <ToolOrderDialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
     </Container>
   );
 };

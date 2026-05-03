@@ -1,0 +1,43 @@
+tags:
+  - Tool Orders
+summary: Get all tool orders with sorting and filtering
+description: >
+  Maintainers see only their own orders.
+  Maintenance managers and admins see all orders.
+  Response includes tool_id field (use /list for a leaner response).
+security:
+  - Bearer: []
+parameters:
+  - in: query
+    name: sort_by
+    type: string
+    enum: [created_at, name, status]
+    default: created_at
+  - in: query
+    name: sort_order
+    type: string
+    enum: [asc, desc]
+    default: desc
+  - in: query
+    name: status
+    type: string
+    enum: [ordered, ready]
+responses:
+  200:
+    description: List of tool orders
+    schema:
+      type: array
+      items:
+        $ref: '#/definitions/ToolOrder'
+  400:
+    description: Invalid query parameter
+    schema:
+      $ref: '#/definitions/Error'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'

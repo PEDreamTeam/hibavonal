@@ -7,7 +7,6 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': 'http://localhost:5000',
-      '/tool-orders': 'http://localhost:5000',
     },
   },
 });

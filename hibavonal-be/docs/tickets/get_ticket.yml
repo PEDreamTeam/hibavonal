@@ -1,0 +1,28 @@
+tags:
+  - Tickets
+summary: Get a single ticket by ID
+security:
+  - Bearer: []
+parameters:
+  - in: path
+    name: ticket_id
+    type: integer
+    required: true
+    description: ID of the ticket
+responses:
+  200:
+    description: Ticket details including assigned tools
+    schema:
+      $ref: '#/definitions/TicketWithTools'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'
+  404:
+    description: Ticket not found
+    schema:
+      $ref: '#/definitions/Error'

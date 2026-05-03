@@ -1,0 +1,53 @@
+tags:
+  - Student Feedback
+summary: Submit feedback for a ticket (student only)
+security:
+  - Bearer: []
+parameters:
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - ticket_id
+        - details
+      properties:
+        ticket_id:
+          type: integer
+          example: 1
+        details:
+          type: string
+          example: The maintenance was helpful and prompt.
+responses:
+  201:
+    description: Feedback submitted successfully
+    schema:
+      type: object
+      properties:
+        student_feedback_id:
+          type: integer
+        ticket_id:
+          type: integer
+        details:
+          type: string
+  400:
+    description: Missing or invalid fields
+    schema:
+      $ref: '#/definitions/Error'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Not the ticket owner
+    schema:
+      $ref: '#/definitions/Error'
+  404:
+    description: Ticket not found
+    schema:
+      $ref: '#/definitions/Error'
+  409:
+    description: Feedback already exists for this ticket
+    schema:
+      $ref: '#/definitions/Error'

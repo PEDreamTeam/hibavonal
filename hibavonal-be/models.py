@@ -11,6 +11,7 @@ class UserRole(enum.Enum):
     maintenance_manager = "maintenance_manager"
     
 class TicketStatus(enum.Enum):
+    created = "created"
     in_progress = "in_progress"
     ready_to_done = "ready_to_done"
     done = "done"
@@ -99,13 +100,13 @@ class Ticket(db.Model):
     ticket_id = db.Column(db.Integer, primary_key=True)
     room_id = db.Column(db.Integer, db.ForeignKey("room.room_id"), nullable=False)
     student_id = db.Column(db.Integer, db.ForeignKey("user.user_id"), nullable=False)
-    maintainer_id = db.Column(db.Integer, db.ForeignKey("user.user_id"), nullable=False)
+    maintainer_id = db.Column(db.Integer, db.ForeignKey("user.user_id"), nullable=True)
     ticket_type_id = db.Column(
-        db.Integer, db.ForeignKey("ticket_type.ticket_type_id"), nullable=False
+        db.Integer, db.ForeignKey("ticket_type.ticket_type_id"), nullable=True
     )
     details = db.Column(db.String(255), nullable=False)
     status = db.Column(
-        db.Enum(TicketStatus), nullable=False, default=TicketStatus.in_progress
+        db.Enum(TicketStatus), nullable=False, default=TicketStatus.created
     )
     priority = db.Column(db.Integer, nullable=False)
     is_deleted = db.Column(db.Boolean, nullable=False, default=False)

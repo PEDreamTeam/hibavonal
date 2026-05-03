@@ -1,0 +1,52 @@
+tags:
+  - Users
+summary: Assign a room to a student user (admin only)
+security:
+  - Bearer: []
+parameters:
+  - in: path
+    name: user_id
+    type: integer
+    required: true
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      properties:
+        room_id:
+          type: integer
+          nullable: true
+          example: 3
+responses:
+  200:
+    description: User with updated room assignment
+    schema:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        username:
+          type: string
+        room_id:
+          type: integer
+          nullable: true
+        room_name:
+          type: string
+          nullable: true
+  400:
+    description: User is not a student
+    schema:
+      $ref: '#/definitions/Error'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'
+  404:
+    description: User or room not found
+    schema:
+      $ref: '#/definitions/Error'

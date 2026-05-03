@@ -1,0 +1,46 @@
+tags:
+  - Tickets
+summary: Update ticket status (role-restricted)
+description: >
+  Maintainers can only set status to 'ready_to_done' on their own assigned tickets.
+  Maintenance managers and admins can only set status to 'done'.
+security:
+  - Bearer: []
+parameters:
+  - in: path
+    name: ticket_id
+    type: integer
+    required: true
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [ready_to_done, done]
+          example: ready_to_done
+responses:
+  200:
+    description: Ticket with updated status
+    schema:
+      $ref: '#/definitions/Ticket'
+  400:
+    description: Invalid status value
+    schema:
+      $ref: '#/definitions/Error'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions or status transition not allowed for role
+    schema:
+      $ref: '#/definitions/Error'
+  404:
+    description: Ticket not found
+    schema:
+      $ref: '#/definitions/Error'

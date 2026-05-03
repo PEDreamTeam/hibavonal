@@ -1,14 +1,17 @@
+from flasgger import swag_from
 from flask import Blueprint, jsonify, request
 
 from extensions import db
 from models import User, UserRole, Room
 from utils.auth import token_required, role_required
+from utils.docs import doc_path
 
 users_bp = Blueprint("users", __name__, url_prefix="/api/users")
 
 
 @users_bp.route("/maintainers", methods=["GET"])
 @token_required
+@swag_from(doc_path("users", "get_maintainers.yml"))
 def get_maintainers():
     maintainers = User.query.filter_by(role=UserRole.maintainer).all()
     return jsonify([{"user_id": u.user_id, "username": u.username} for u in maintainers]), 200
@@ -16,6 +19,7 @@ def get_maintainers():
 
 @users_bp.route("/students", methods=["GET"])
 @role_required("admin")
+@swag_from(doc_path("users", "get_students.yml"))
 def get_students():
     students = User.query.filter_by(role=UserRole.student).all()
     return jsonify([
@@ -32,6 +36,7 @@ def get_students():
 
 @users_bp.route("/<int:user_id>/room", methods=["PUT"])
 @role_required("admin")
+@swag_from(doc_path("users", "assign_user_room.yml"))
 def assign_user_room(user_id):
     user = User.query.get(user_id)
     if not user:

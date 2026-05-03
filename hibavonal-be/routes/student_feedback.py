@@ -1,8 +1,10 @@
+from flasgger import swag_from
 from flask import Blueprint, request, jsonify
 
 from extensions import db
 from models import StudentFeedback, Ticket
 from utils.auth import role_required
+from utils.docs import doc_path
 
 student_feedback_bp = Blueprint("student_feedback", __name__, url_prefix="/api/student-feedback")
 
@@ -17,78 +19,8 @@ def student_feedback_to_dict(feedback):
 
 @student_feedback_bp.route("", methods=["POST"])
 @role_required("student")
+@swag_from(doc_path("student_feedback", "create_student_feedback.yml"))
 def create_student_feedback():
-    """
-    Submit student feedback for a ticket
-    ---
-    tags:
-      - Student Feedback
-    security:
-      - Bearer: []
-    parameters:
-      - in: body
-        name: body
-        required: true
-        schema:
-          type: object
-          required:
-            - ticket_id
-            - details
-          properties:
-            ticket_id:
-              type: integer
-              example: 1
-            details:
-              type: string
-              example: "The maintenance was helpful and prompt."
-    responses:
-      201:
-        description: Feedback successfully created
-        schema:
-          type: object
-          properties:
-            student_feedback_id:
-              type: integer
-            ticket_id:
-              type: integer
-            details:
-              type: string
-      400:
-        description: Bad request - missing or invalid required fields
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      401:
-        description: Unauthorized - missing or invalid token
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      403:
-        description: Forbidden - insufficient permissions or ticket ownership mismatch
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      404:
-        description: Ticket not found
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      409:
-        description: Feedback already exists for this ticket
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-    """
     data = request.get_json()
     if not data:
         return jsonify({"error": "Request body is required"}), 400

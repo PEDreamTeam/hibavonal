@@ -1,0 +1,42 @@
+tags:
+  - Tickets
+summary: Update the ticket type (maintainer / maintenance manager)
+security:
+  - Bearer: []
+parameters:
+  - in: path
+    name: ticket_id
+    type: integer
+    required: true
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - ticket_type_id
+      properties:
+        ticket_type_id:
+          type: integer
+          example: 2
+responses:
+  200:
+    description: Ticket with updated type and associated tools
+    schema:
+      $ref: '#/definitions/TicketWithTools'
+  400:
+    description: Missing ticket_type_id
+    schema:
+      $ref: '#/definitions/Error'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'
+  404:
+    description: Ticket or ticket type not found
+    schema:
+      $ref: '#/definitions/Error'

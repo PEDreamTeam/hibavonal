@@ -1,0 +1,36 @@
+tags:
+  - Rooms
+summary: Delete a room (admin only)
+security:
+  - Bearer: []
+parameters:
+  - in: path
+    name: room_id
+    type: integer
+    required: true
+    description: ID of the room to delete
+responses:
+  200:
+    description: Room deleted successfully
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Room deleted
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'
+  404:
+    description: Room not found
+    schema:
+      $ref: '#/definitions/Error'
+  409:
+    description: Room has assigned users or tickets
+    schema:
+      $ref: '#/definitions/Error'

@@ -11,6 +11,7 @@ import Rooms from './pages/rooms/Rooms';
 import AddTicketTypeForm from './pages/ticket-types/AddTicketTypeForm';
 import StudentFeedbackForm from './pages/feedback/StudentFeedbackForm';
 import AddToolForm from './pages/tools/AddToolForm';
+import ToolsList from './pages/tools/ToolsList';
 import Settings from './pages/settings/Settings';
 
 const App = () => {
@@ -24,14 +25,27 @@ const App = () => {
         <Route path="/tool-order" element={<ToolOrderForm />} />
         <Route path="/ticket-types/new" element={<AddTicketTypeForm />} />
         <Route path="/feedback/new" element={<StudentFeedbackForm />} />
-        <Route path="/tools/new" element={<AddToolForm />} />
         <Route path="/settings" element={<Settings />} />
+        <Route
+          path="/tools"
+          element={
+            <ProtectedRoute roles={['maintainer', 'maintenance_manager', 'admin']}>
+              <ToolsList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tools/new"
+          element={
+            <ProtectedRoute roles={['admin']}>
+              <AddToolForm />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/tool-orders/list"
           element={
-            <ProtectedRoute
-              roles={['maintainer', 'maintenance_manager', 'admin']}
-            >
+            <ProtectedRoute roles={['maintainer', 'maintenance_manager', 'admin']}>
               <ToolOrdersList />
             </ProtectedRoute>
           }

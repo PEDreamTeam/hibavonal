@@ -1,0 +1,12 @@
+tags:
+  - Health
+summary: API health check
+responses:
+  200:
+    description: API is running
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Hello from Flask backend!

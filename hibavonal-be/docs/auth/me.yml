@@ -1,0 +1,17 @@
+tags:
+  - Authentication
+summary: Get current authenticated user
+security:
+  - Bearer: []
+responses:
+  200:
+    description: Current user information
+    schema:
+      type: object
+      properties:
+        user:
+          $ref: '#/definitions/User'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'

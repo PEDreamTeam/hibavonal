@@ -1,0 +1,34 @@
+tags:
+  - Tool Orders
+summary: Delete a tool order (maintainer / maintenance manager)
+security:
+  - Bearer: []
+parameters:
+  - in: path
+    name: tool_order_id
+    type: integer
+    required: true
+responses:
+  200:
+    description: Tool order deleted successfully
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'
+  404:
+    description: Tool order not found
+    schema:
+      $ref: '#/definitions/Error'
+  500:
+    description: Internal server error
+    schema:
+      $ref: '#/definitions/Error'

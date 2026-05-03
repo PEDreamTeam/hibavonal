@@ -1,83 +1,22 @@
+from flasgger import swag_from
 from flask import Blueprint, jsonify, request
 from models import db, ToolOrder, ToolOrderStatus, Tool, UserRole
-from utils.auth import token_required
-from routes.tool_orders_helpers import format_tool_order
+from utils.auth import token_required, role_required
+from utils.docs import doc_path
 import logging
 
 logger = logging.getLogger(__name__)
 
-tool_orders_bp = Blueprint("tool_orders", __name__, url_prefix="/tool-orders")
+tool_orders_bp = Blueprint("tool_orders", __name__, url_prefix="/api/tool-orders")
 
 
 @tool_orders_bp.route("/list", methods=["GET"])
 @token_required
+@swag_from(doc_path("tool_orders", "get_tool_orders_list.yml"))
 def get_tool_orders_list():
-    """
-    Get list of tool orders with role-based filtering and sorting
-    ---
-    tags:
-      - Tool Orders
-    security:
-      - Bearer: []
-    parameters:
-      - in: query
-        name: sort_by
-        type: string
-        enum: ["created_at", "name", "status"]
-        default: "created_at"
-        description: Field to sort by
-      - in: query
-        name: sort_order
-        type: string
-        enum: ["asc", "desc"]
-        default: "desc"
-        description: Sort order
-      - in: query
-        name: status
-        type: string
-        enum: ["ordered", "ready"]
-        description: Filter by status
-    responses:
-      200:
-        description: List of tool orders visible to user
-        schema:
-          type: array
-          items:
-            type: object
-            properties:
-              tool_order_id:
-                type: integer
-              tool_name:
-                type: string
-              name:
-                type: string
-              details:
-                type: string
-                nullable: true
-              status:
-                type: string
-              created_by:
-                type: string
-              created_at:
-                type: string
-      401:
-        description: Unauthorized - invalid or missing token
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      403:
-        description: Forbidden - insufficient permissions
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-    """
     current_user = request.current_user
 
-    if current_user.role not in [UserRole.maintainer, UserRole.maintenance_manager]:
+    if current_user.role not in [UserRole.maintainer, UserRole.maintenance_manager, UserRole.admin]:
         return jsonify({"error": "Insufficient permissions"}), 403
 
     query = ToolOrder.query
@@ -130,59 +69,11 @@ def get_tool_orders_list():
 
 @tool_orders_bp.route("", methods=["GET"])
 @token_required
+@swag_from(doc_path("tool_orders", "get_tool_orders.yml"))
 def get_tool_orders():
-    """
-    Get all tool orders with role-based access control
-    ---
-    tags:
-      - Tool Orders
-    security:
-      - Bearer: []
-    parameters:
-      - in: query
-        name: sort_by
-        type: string
-        enum: ["created_at", "name", "status"]
-        default: "created_at"
-      - in: query
-        name: sort_order
-        type: string
-        enum: ["asc", "desc"]
-        default: "desc"
-      - in: query
-        name: status
-        type: string
-        enum: ["ordered", "ready"]
-    responses:
-      200:
-        description: List of tool orders
-        schema:
-          type: array
-          items:
-            type: object
-            properties:
-              tool_order_id:
-                type: integer
-              tool_name:
-                type: string
-              name:
-                type: string
-              details:
-                type: string
-              status:
-                type: string
-              created_by:
-                type: string
-              created_at:
-                type: string
-      401:
-        description: Unauthorized
-      403:
-        description: Forbidden
-    """
     current_user = request.current_user
 
-    if current_user.role not in [UserRole.maintainer, UserRole.maintenance_manager]:
+    if current_user.role not in [UserRole.maintainer, UserRole.maintenance_manager, UserRole.admin]:
         return jsonify({"error": "Insufficient permissions"}), 403
 
     query = ToolOrder.query
@@ -236,46 +127,8 @@ def get_tool_orders():
 
 @tool_orders_bp.route("/<int:tool_order_id>", methods=["GET"])
 @token_required
+@swag_from(doc_path("tool_orders", "get_tool_order.yml"))
 def get_tool_order(tool_order_id):
-    """
-    Get a single tool order by ID
-    ---
-    tags:
-      - ToolOrders
-    parameters:
-      - in: path
-        name: tool_order_id
-        type: integer
-        required: true
-        description: ID of the tool order to retrieve
-    responses:
-      200:
-        description: Tool order details
-        schema:
-          type: object
-          properties:
-            tool_order_id:
-              type: integer
-            tool_id:
-              type: integer
-            tool_name:
-              type: string
-              nullable: true
-            name:
-              type: string
-            details:
-              type: string
-              nullable: true
-            status:
-              type: string
-      404:
-        description: Tool order not found
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-    """
     order = ToolOrder.query.get(tool_order_id)
 
     if not order:
@@ -301,73 +154,8 @@ def get_tool_order(tool_order_id):
 
 @tool_orders_bp.route("/<int:tool_order_id>", methods=["PUT"])
 @token_required
+@swag_from(doc_path("tool_orders", "update_tool_order.yml"))
 def update_tool_order(tool_order_id):
-    """
-    Update tool order status
-    ---
-    tags:
-      - Tool Orders
-    security:
-      - Bearer: []
-    parameters:
-      - in: path
-        name: tool_order_id
-        type: integer
-        required: true
-      - in: body
-        name: body
-        required: true
-        schema:
-          type: object
-          properties:
-            status:
-              type: string
-              enum: ["ordered", "ready"]
-              example: "ready"
-    responses:
-      200:
-        description: Tool order successfully updated
-        schema:
-          type: object
-          properties:
-            message:
-              type: string
-      400:
-        description: Bad request - invalid status
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      401:
-        description: Unauthorized
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      403:
-        description: Forbidden - insufficient permissions
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      404:
-        description: Tool order not found
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      500:
-        description: Internal server error
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-    """
     try:
         order = ToolOrder.query.get(tool_order_id)
 
@@ -406,56 +194,8 @@ def update_tool_order(tool_order_id):
 
 @tool_orders_bp.route("/<int:tool_order_id>", methods=["DELETE"])
 @token_required
+@swag_from(doc_path("tool_orders", "delete_tool_order.yml"))
 def delete_tool_order(tool_order_id):
-    """
-    Delete tool order
-    ---
-    tags:
-      - Tool Orders
-    security:
-      - Bearer: []
-    parameters:
-      - in: path
-        name: tool_order_id
-        type: integer
-        required: true
-    responses:
-      200:
-        description: Tool order successfully deleted
-        schema:
-          type: object
-          properties:
-            message:
-              type: string
-      401:
-        description: Unauthorized
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      403:
-        description: Forbidden - insufficient permissions
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      404:
-        description: Tool order not found
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      500:
-        description: Internal server error
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-    """
     try:
         order = ToolOrder.query.get(tool_order_id)
 
@@ -480,72 +220,9 @@ def delete_tool_order(tool_order_id):
 
 
 @tool_orders_bp.route("", methods=["POST"])
-@token_required
+@role_required("maintenance_manager", "admin")
+@swag_from(doc_path("tool_orders", "create_tool_order.yml"))
 def create_tool_order():
-    """
-    Create a new tool order
-    ---
-    tags:
-      - Tool Orders
-    security:
-      - Bearer: []
-    parameters:
-      - in: body
-        name: body
-        required: true
-        schema:
-          type: object
-          required:
-            - tool_id
-            - name
-          properties:
-            tool_id:
-              type: integer
-              example: 1
-            name:
-              type: string
-              example: "Order drill bits"
-            details:
-              type: string
-              nullable: true
-              example: "High-speed bits"
-            status:
-              type: string
-              enum: ["ordered", "ready"]
-              default: "ordered"
-              example: "ordered"
-    responses:
-      201:
-        description: Tool order created successfully
-        schema:
-          type: object
-          properties:
-            message:
-              type: string
-            tool_order_id:
-              type: integer
-      400:
-        description: Bad request - missing or invalid fields
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      401:
-        description: Unauthorized
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      500:
-        description: Internal server error
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-    """
     try:
         data = request.get_json()
 

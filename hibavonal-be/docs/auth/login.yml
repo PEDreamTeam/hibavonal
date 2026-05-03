@@ -1,0 +1,40 @@
+tags:
+  - Authentication
+summary: Authenticate and get JWT token
+parameters:
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        password:
+          type: string
+          format: password
+          example: securepassword123
+responses:
+  200:
+    description: Login successful
+    schema:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT token valid for 24 hours
+        user:
+          $ref: '#/definitions/User'
+  400:
+    description: Missing required fields
+    schema:
+      $ref: '#/definitions/Error'
+  401:
+    description: Invalid email or password
+    schema:
+      $ref: '#/definitions/Error'

@@ -1,0 +1,22 @@
+tags:
+  - Ticket Types
+summary: List all ticket types
+responses:
+  200:
+    description: List of all ticket types
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          ticket_type_id:
+            type: integer
+          name:
+            type: string
+          details:
+            type: string
+            nullable: true
+          tool_ids:
+            type: array
+            items:
+              type: integer

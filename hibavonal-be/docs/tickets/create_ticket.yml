@@ -1,0 +1,44 @@
+tags:
+  - Tickets
+summary: Create a new ticket (student only)
+security:
+  - Bearer: []
+parameters:
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - room_id
+        - details
+        - priority
+      properties:
+        room_id:
+          type: integer
+          example: 1
+        details:
+          type: string
+          example: The projector is broken
+        priority:
+          type: integer
+          minimum: 0
+          maximum: 5
+          example: 3
+responses:
+  201:
+    description: Ticket created with status 'created'
+    schema:
+      $ref: '#/definitions/Ticket'
+  400:
+    description: Missing or invalid fields
+    schema:
+      $ref: '#/definitions/Error'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'

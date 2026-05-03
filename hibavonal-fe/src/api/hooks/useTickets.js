@@ -16,12 +16,30 @@ const useTickets = () => {
     return ticket;
   };
 
+  const updateTicketType = async (ticketId, ticketTypeId) => {
+    const ticket = await apiPut(`/api/tickets/${ticketId}/ticket-type`, {
+      ticket_type_id: ticketTypeId,
+    });
+    await mutate();
+    return ticket;
+  };
+
+  const assignMaintainer = async (ticketId, maintainerId) => {
+    const ticket = await apiPut(`/api/tickets/${ticketId}/maintainer`, {
+      maintainer_id: maintainerId,
+    });
+    await mutate();
+    return ticket;
+  };
+
   return {
     tickets: data || [],
     isLoading,
     error: error?.info?.error || error?.message || null,
     createTicket,
     updateTicketStatus,
+    updateTicketType,
+    assignMaintainer,
   };
 };
 

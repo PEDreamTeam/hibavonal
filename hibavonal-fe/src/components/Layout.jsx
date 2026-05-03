@@ -59,23 +59,16 @@ const Layout = ({ children }) => {
     if (user?.role === 'maintainer' || user?.role === 'maintenance_manager') {
       menuItems.push(
         { label: 'Rooms', icon: <MeetingRoomIcon />, path: '/rooms' },
+        { label: 'Tools', icon: <HandymanIcon />, path: '/tools' },
         { label: 'Tool Orders', icon: <StorageIcon />, path: '/tool-orders/list' }
       );
     }
 
     if (user?.role === 'admin') {
       menuItems.push(
-        {
-          label: 'Tool Orders',
-          icon: <StorageIcon />,
-          path: '/tool-orders/list',
-        },
-        { label: 'Add Tool', icon: <HandymanIcon />, path: '/tools/new' },
-        {
-          label: 'Add Ticket Type',
-          icon: <CategoryIcon />,
-          path: '/ticket-types/new',
-        },
+        { label: 'Tool Orders', icon: <StorageIcon />, path: '/tool-orders/list' },
+        { label: 'Tools', icon: <HandymanIcon />, path: '/tools' },
+        { label: 'Add Ticket Type', icon: <CategoryIcon />, path: '/ticket-types/new' },
         { label: 'Rooms', icon: <MeetingRoomIcon />, path: '/rooms' },
         { label: 'Settings', icon: <SettingsIcon />, path: '/settings' }
       );

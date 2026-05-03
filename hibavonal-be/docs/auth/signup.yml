@@ -1,0 +1,47 @@
+tags:
+  - Authentication
+summary: Register a new user
+parameters:
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          example: john_doe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        password:
+          type: string
+          format: password
+          example: securepassword123
+        role:
+          type: string
+          enum: [student, admin, maintainer, maintenance_manager]
+          default: student
+responses:
+  201:
+    description: User registered successfully
+    schema:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: '#/definitions/User'
+  400:
+    description: Missing or invalid fields
+    schema:
+      $ref: '#/definitions/Error'
+  409:
+    description: Email or username already taken
+    schema:
+      $ref: '#/definitions/Error'

@@ -14,22 +14,29 @@ import {
 } from '@mui/material';
 import useTickets from '../../api/hooks/useTickets';
 
-const STATUS_OPTIONS = [
-  { value: 'in_progress', label: 'In Progress' },
+const STATUS_OPTIONS_MAINTAINER = [
   { value: 'ready_to_done', label: 'Ready to Done' },
-  { value: 'done', label: 'Done' },
 ];
 
-export default function EditStatusDialog({ open, ticket, onClose }) {
-  const [status, setStatus] = useState('in_progress');
+const STATUS_OPTIONS_MANAGER = [{ value: 'done', label: 'Done' }];
+
+export default function EditStatusDialog({ open, ticket, userRole, onClose }) {
+  const [status, setStatus] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
   const { updateTicketStatus } = useTickets();
 
+  const statusOptions =
+    userRole === 'maintainer'
+      ? STATUS_OPTIONS_MAINTAINER
+      : STATUS_OPTIONS_MANAGER;
+
   useEffect(() => {
-    if (ticket) setStatus(ticket.status);
-  }, [ticket]);
+    if (ticket && statusOptions.length > 0) {
+      setStatus(statusOptions[0].value);
+    }
+  }, [ticket, userRole]);
 
   const handleSubmit = async () => {
     setSubmitting(true);
@@ -57,7 +64,7 @@ export default function EditStatusDialog({ open, ticket, onClose }) {
               label="Status"
               onChange={(e) => setStatus(e.target.value)}
             >
-              {STATUS_OPTIONS.map((opt) => (
+              {statusOptions.map((opt) => (
                 <MenuItem key={opt.value} value={opt.value}>
                   {opt.label}
                 </MenuItem>
