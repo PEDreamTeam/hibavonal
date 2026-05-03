@@ -39,15 +39,6 @@ app.register_blueprint(tickets_bp)
 
 swagger = Swagger(app)
 
-from routes.auth import auth_bp
-app.register_blueprint(auth_bp, url_prefix="/api/auth")
-
-from routes.rooms import rooms_bp
-app.register_blueprint(rooms_bp, url_prefix="/api/rooms")
-
-from routes.tickets import tickets_bp
-app.register_blueprint(tickets_bp, url_prefix="/api/tickets")
-
 @app.route("/", methods=["GET"])
 def index():
     """
