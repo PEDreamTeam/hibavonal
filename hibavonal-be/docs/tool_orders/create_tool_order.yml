@@ -1,0 +1,55 @@
+tags:
+  - Tool Orders
+summary: Create a new tool order (maintenance manager / admin)
+security:
+  - Bearer: []
+parameters:
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - tool_id
+        - name
+      properties:
+        tool_id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Order drill bits
+        details:
+          type: string
+          nullable: true
+          example: High-speed bits
+        status:
+          type: string
+          enum: [ordered, ready]
+          default: ordered
+responses:
+  201:
+    description: Tool order created successfully
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+        tool_order_id:
+          type: integer
+  400:
+    description: Missing or invalid fields
+    schema:
+      $ref: '#/definitions/Error'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'
+  500:
+    description: Internal server error
+    schema:
+      $ref: '#/definitions/Error'

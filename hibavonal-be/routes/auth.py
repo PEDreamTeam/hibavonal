@@ -1,12 +1,14 @@
 from datetime import datetime, timedelta, timezone
 
 import jwt
+from flasgger import swag_from
 from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from extensions import db
 from models import User, UserRole
 from utils.auth import token_required
+from utils.docs import doc_path
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -32,77 +34,8 @@ def user_to_dict(user):
 
 
 @auth_bp.route("/signup", methods=["POST"])
+@swag_from(doc_path("auth", "signup.yml"))
 def signup():
-    """
-    Register a new user
-    ---
-    tags:
-      - Authentication
-    parameters:
-      - in: body
-        name: body
-        required: true
-        schema:
-          type: object
-          required:
-            - username
-            - email
-            - password
-          properties:
-            username:
-              type: string
-              example: "john_doe"
-            email:
-              type: string
-              format: email
-              example: "john@example.com"
-            password:
-              type: string
-              format: password
-              example: "securepassword123"
-            role:
-              type: string
-              enum: ["student", "admin", "teacher"]
-              default: "student"
-              example: "student"
-    responses:
-      201:
-        description: User successfully registered
-        schema:
-          type: object
-          properties:
-            token:
-              type: string
-              description: JWT authentication token
-            user:
-              type: object
-              properties:
-                user_id:
-                  type: integer
-                username:
-                  type: string
-                email:
-                  type: string
-                role:
-                  type: string
-                room_id:
-                  type: integer
-                  nullable: true
-      400:
-        description: Bad request - missing or invalid required fields
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      409:
-        description: Conflict - email or username already exists
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-    """
     data = request.get_json()
 
     if not data:
@@ -141,68 +74,8 @@ def signup():
 
 
 @auth_bp.route("/login", methods=["POST"])
+@swag_from(doc_path("auth", "login.yml"))
 def login():
-    """
-    Authenticate user and get JWT token
-    ---
-    tags:
-      - Authentication
-    parameters:
-      - in: body
-        name: body
-        required: true
-        schema:
-          type: object
-          required:
-            - email
-            - password
-          properties:
-            email:
-              type: string
-              format: email
-              example: "john@example.com"
-            password:
-              type: string
-              format: password
-              example: "securepassword123"
-    responses:
-      200:
-        description: Login successful
-        schema:
-          type: object
-          properties:
-            token:
-              type: string
-              description: JWT authentication token valid for 24 hours
-            user:
-              type: object
-              properties:
-                user_id:
-                  type: integer
-                username:
-                  type: string
-                email:
-                  type: string
-                role:
-                  type: string
-                room_id:
-                  type: integer
-                  nullable: true
-      400:
-        description: Bad request - missing required fields
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-      401:
-        description: Unauthorized - invalid email or password
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-    """
     data = request.get_json()
 
     if not data:
@@ -224,40 +97,6 @@ def login():
 
 @auth_bp.route("/me", methods=["GET"])
 @token_required
+@swag_from(doc_path("auth", "me.yml"))
 def me():
-    """
-    Get current user information
-    ---
-    tags:
-      - Authentication
-    security:
-      - Bearer: []
-    responses:
-      200:
-        description: Current user information
-        schema:
-          type: object
-          properties:
-            user:
-              type: object
-              properties:
-                user_id:
-                  type: integer
-                username:
-                  type: string
-                email:
-                  type: string
-                role:
-                  type: string
-                room_id:
-                  type: integer
-                  nullable: true
-      401:
-        description: Unauthorized - invalid or missing token
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-    """
     return jsonify({"user": user_to_dict(request.current_user)}), 200

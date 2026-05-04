@@ -1,0 +1,20 @@
+tags:
+  - Rooms
+summary: List all rooms
+security:
+  - Bearer: []
+responses:
+  200:
+    description: List of all rooms
+    schema:
+      type: array
+      items:
+        $ref: '#/definitions/Room'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'

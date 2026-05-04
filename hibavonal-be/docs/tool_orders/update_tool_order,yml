@@ -1,0 +1,50 @@
+tags:
+  - Tool Orders
+summary: Update tool order status (maintainer / maintenance manager)
+security:
+  - Bearer: []
+parameters:
+  - in: path
+    name: tool_order_id
+    type: integer
+    required: true
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [ordered, ready]
+          example: ready
+responses:
+  200:
+    description: Tool order updated successfully
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+  400:
+    description: Missing or invalid status
+    schema:
+      $ref: '#/definitions/Error'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'
+  404:
+    description: Tool order not found
+    schema:
+      $ref: '#/definitions/Error'
+  500:
+    description: Internal server error
+    schema:
+      $ref: '#/definitions/Error'
