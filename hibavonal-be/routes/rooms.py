@@ -18,7 +18,7 @@ def room_to_dict(room):
 
 
 @rooms_bp.route("", methods=["GET"])
-@role_required("admin", "maintainer", "maintenance_manager", "student")
+@role_required("admin")
 @swag_from(doc_path("rooms", "get_rooms.yml"))
 def get_rooms():
     rooms = Room.query.all()

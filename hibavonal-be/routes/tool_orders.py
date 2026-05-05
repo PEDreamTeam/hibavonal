@@ -221,6 +221,7 @@ def delete_tool_order(tool_order_id):
 
 @tool_orders_bp.route("", methods=["POST"])
 @role_required("maintenance_manager", "admin")
+@token_required
 @swag_from(doc_path("tool_orders", "create_tool_order.yml"))
 def create_tool_order():
     try:

@@ -29,7 +29,6 @@ from routes.auth import auth_bp
 from routes.rooms import rooms_bp
 from routes.student_feedback import student_feedback_bp
 from routes.tickets import tickets_bp
-from routes.users import users_bp
 from routes.tools import tools_bp
 
 app.register_blueprint(tool_orders_bp)
@@ -38,7 +37,6 @@ app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(rooms_bp, url_prefix="/api/rooms")
 app.register_blueprint(student_feedback_bp)
 app.register_blueprint(tickets_bp)
-app.register_blueprint(users_bp)
 app.register_blueprint(tools_bp)
 
 swagger_template = {
@@ -142,7 +140,6 @@ swagger_template = {
 swagger = Swagger(app, template=swagger_template)
 
 from utils.docs import doc_path
-
 
 @app.route("/", methods=["GET"])
 @swag_from(doc_path("health", "index.yml"))
