@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { fetcher, apiPost } from '../fetcher';
+import { fetcher, apiPost, apiPut } from '../fetcher';
 
 const useToolOrdersList = () => {
   const { data, error, isLoading, mutate } = useSWR(
@@ -13,11 +13,18 @@ const useToolOrdersList = () => {
     return order;
   };
 
+  const updateToolOrderStatus = async (toolOrderId, status) => {
+    const result = await apiPut(`/api/tool-orders/${toolOrderId}`, { status });
+    await mutate();
+    return result;
+  };
+
   return {
     toolOrders: data || [],
     isLoading,
     error: error?.info?.error || error?.message || null,
     createToolOrder,
+    updateToolOrderStatus,
   };
 };
 

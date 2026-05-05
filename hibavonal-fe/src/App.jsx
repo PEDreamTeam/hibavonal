@@ -18,7 +18,14 @@ const App = () => {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/tickets" element={<Tickets />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
