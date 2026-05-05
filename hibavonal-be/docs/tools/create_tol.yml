@@ -1,0 +1,39 @@
+tags:
+  - Tools
+summary: Create a new tool (admin only)
+security:
+  - Bearer: []
+parameters:
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Power drill
+responses:
+  201:
+    description: Tool created successfully
+    schema:
+      type: object
+      properties:
+        tool_id:
+          type: integer
+        name:
+          type: string
+  400:
+    description: Missing or invalid name
+    schema:
+      $ref: '#/definitions/Error'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'

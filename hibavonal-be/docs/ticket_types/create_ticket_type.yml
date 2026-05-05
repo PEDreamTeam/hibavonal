@@ -1,0 +1,48 @@
+tags:
+  - Ticket Types
+summary: Create a new ticket type (admin only)
+security:
+  - Bearer: []
+parameters:
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Electrical Repair
+        details:
+          type: string
+          nullable: true
+          example: Fix lighting or outlets
+        tool_ids:
+          type: array
+          items:
+            type: integer
+          example: [1, 2]
+responses:
+  201:
+    description: Ticket type created successfully
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+        ticket_type_id:
+          type: integer
+  400:
+    description: Missing or invalid fields
+    schema:
+      $ref: '#/definitions/Error'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'

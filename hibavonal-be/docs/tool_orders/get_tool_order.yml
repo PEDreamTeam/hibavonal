@@ -1,0 +1,27 @@
+tags:
+  - Tool Orders
+summary: Get a single tool order by ID
+security:
+  - Bearer: []
+parameters:
+  - in: path
+    name: tool_order_id
+    type: integer
+    required: true
+responses:
+  200:
+    description: Tool order details
+    schema:
+      $ref: '#/definitions/ToolOrder'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'
+  404:
+    description: Tool order not found
+    schema:
+      $ref: '#/definitions/Error'
