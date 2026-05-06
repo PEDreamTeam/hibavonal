@@ -1,0 +1,24 @@
+tags:
+  - Tickets
+summary: List tickets visible to the current user
+description: >
+  Students see only their own tickets.
+  Maintainers see tickets assigned to them.
+  Maintenance managers and admins see all tickets.
+security:
+  - Bearer: []
+responses:
+  200:
+    description: List of tickets
+    schema:
+      type: array
+      items:
+        $ref: '#/definitions/Ticket'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'

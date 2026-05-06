@@ -1,6 +1,5 @@
 from flasgger import Swagger, swag_from
 from flask import Flask, jsonify
-from flasgger import Swagger
 from flask_cors import CORS
 import os
 from pathlib import Path
@@ -31,6 +30,7 @@ from routes.rooms import rooms_bp
 from routes.student_feedback import student_feedback_bp
 from routes.tickets import tickets_bp
 from routes.tools import tools_bp
+from routes.users import users_bp
 
 app.register_blueprint(tool_orders_bp)
 app.register_blueprint(ticket_types_bp)
@@ -39,6 +39,7 @@ app.register_blueprint(rooms_bp, url_prefix="/api/rooms")
 app.register_blueprint(student_feedback_bp)
 app.register_blueprint(tickets_bp)
 app.register_blueprint(tools_bp)
+app.register_blueprint(users_bp)
 
 swagger_template = {
     "swagger": "2.0",

@@ -1,0 +1,21 @@
+tags:
+  - Users
+summary: List all maintainer users
+security:
+  - Bearer: []
+responses:
+  200:
+    description: List of maintainers
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          user_id:
+            type: integer
+          username:
+            type: string
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'

@@ -1,45 +1,30 @@
-import { useState, useCallback } from 'react';
+import useSWR from 'swr';
+import { fetcher, apiPost, apiPut } from '../fetcher';
 
 const useToolOrdersList = () => {
-  const [toolOrders, setToolOrders] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { data, error, isLoading, mutate } = useSWR(
+    '/api/tool-orders/list',
+    fetcher
+  );
 
-  const fetchToolOrders = useCallback(async (token) => {
-    try {
-      setLoading(true);
-      setError(null);
+  const createToolOrder = async (body) => {
+    const order = await apiPost('/api/tool-orders', body);
+    await mutate();
+    return order;
+  };
 
-      const response = await fetch('http://localhost:5000/tool-orders/list', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        if (response.status === 403) {
-          throw new Error('Insufficient permissions to view tool orders');
-        }
-        throw new Error(`Failed to fetch tool orders: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setToolOrders(data);
-    } catch (err) {
-      setError(err.message);
-      setToolOrders([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const updateToolOrderStatus = async (toolOrderId, status) => {
+    const result = await apiPut(`/api/tool-orders/${toolOrderId}`, { status });
+    await mutate();
+    return result;
+  };
 
   return {
-    toolOrders,
-    loading,
-    error,
-    fetchToolOrders,
+    toolOrders: data || [],
+    isLoading,
+    error: error?.info?.error || error?.message || null,
+    createToolOrder,
+    updateToolOrderStatus,
   };
 };
 

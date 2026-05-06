@@ -1,0 +1,44 @@
+tags:
+  - Tickets
+summary: Assign or unassign a maintainer (maintenance manager / admin only)
+description: >
+  Setting a maintainer automatically transitions the ticket status to 'in_progress'.
+  Pass null to unassign.
+security:
+  - Bearer: []
+parameters:
+  - in: path
+    name: ticket_id
+    type: integer
+    required: true
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      properties:
+        maintainer_id:
+          type: integer
+          nullable: true
+          example: 5
+responses:
+  200:
+    description: Ticket with updated maintainer
+    schema:
+      $ref: '#/definitions/Ticket'
+  400:
+    description: Target user is not a maintainer
+    schema:
+      $ref: '#/definitions/Error'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'
+  404:
+    description: Ticket or user not found
+    schema:
+      $ref: '#/definitions/Error'

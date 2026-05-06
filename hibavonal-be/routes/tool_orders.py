@@ -1,24 +1,20 @@
 from flasgger import swag_from
 from flask import Blueprint, jsonify, request
 from models import db, ToolOrder, ToolOrderStatus, Tool, UserRole
-from utils.auth import token_required
-from routes.tool_orders_helpers import format_tool_order
+from utils.auth import role_required
 from utils.docs import doc_path
 import logging
 
 logger = logging.getLogger(__name__)
 
-tool_orders_bp = Blueprint("tool_orders", __name__, url_prefix="/tool-orders")
+tool_orders_bp = Blueprint("tool_orders", __name__, url_prefix="/api/tool-orders")
 
 
 @tool_orders_bp.route("/list", methods=["GET"])
-@token_required
+@role_required("maintainer", "maintenance_manager", "admin")
 @swag_from(doc_path("tool_orders", "get_tool_orders_list.yml"))
 def get_tool_orders_list():
     current_user = request.current_user
-
-    if current_user.role not in [UserRole.maintainer, UserRole.maintenance_manager]:
-        return jsonify({"error": "Insufficient permissions"}), 403
 
     query = ToolOrder.query
 
@@ -69,13 +65,10 @@ def get_tool_orders_list():
 
 
 @tool_orders_bp.route("", methods=["GET"])
-@token_required
+@role_required("maintainer", "maintenance_manager", "admin")
 @swag_from(doc_path("tool_orders", "get_tool_orders.yml"))
 def get_tool_orders():
     current_user = request.current_user
-
-    if current_user.role not in [UserRole.maintainer, UserRole.maintenance_manager]:
-        return jsonify({"error": "Insufficient permissions"}), 403
 
     query = ToolOrder.query
 
@@ -127,7 +120,7 @@ def get_tool_orders():
 
 
 @tool_orders_bp.route("/<int:tool_order_id>", methods=["GET"])
-@token_required
+@role_required("maintainer", "maintenance_manager", "admin")
 @swag_from(doc_path("tool_orders", "get_tool_order.yml"))
 def get_tool_order(tool_order_id):
     order = ToolOrder.query.get(tool_order_id)
@@ -154,7 +147,7 @@ def get_tool_order(tool_order_id):
 
 
 @tool_orders_bp.route("/<int:tool_order_id>", methods=["PUT"])
-@token_required
+@role_required("maintainer", "maintenance_manager", "admin")
 @swag_from(doc_path("tool_orders", "update_tool_order.yml"))
 def update_tool_order(tool_order_id):
     try:
@@ -164,9 +157,6 @@ def update_tool_order(tool_order_id):
             return jsonify({"error": "Tool order not found"}), 404
 
         current_user = request.current_user
-        if current_user.role not in [UserRole.maintainer, UserRole.maintenance_manager]:
-            return jsonify({"error": "Insufficient permissions"}), 403
-
         if current_user.role == UserRole.maintainer and order.created_by_id != current_user.user_id:
             return jsonify({"error": "Insufficient permissions"}), 403
 
@@ -194,7 +184,7 @@ def update_tool_order(tool_order_id):
 
 
 @tool_orders_bp.route("/<int:tool_order_id>", methods=["DELETE"])
-@token_required
+@role_required("maintainer", "maintenance_manager")
 @swag_from(doc_path("tool_orders", "delete_tool_order.yml"))
 def delete_tool_order(tool_order_id):
     try:
@@ -204,9 +194,6 @@ def delete_tool_order(tool_order_id):
             return jsonify({"error": "Tool order not found"}), 404
 
         current_user = request.current_user
-        if current_user.role not in [UserRole.maintainer, UserRole.maintenance_manager]:
-            return jsonify({"error": "Insufficient permissions"}), 403
-
         if current_user.role == UserRole.maintainer and order.created_by_id != current_user.user_id:
             return jsonify({"error": "Insufficient permissions"}), 403
 
@@ -221,7 +208,7 @@ def delete_tool_order(tool_order_id):
 
 
 @tool_orders_bp.route("", methods=["POST"])
-@token_required
+@role_required("maintenance_manager", "admin")
 @swag_from(doc_path("tool_orders", "create_tool_order.yml"))
 def create_tool_order():
     try:

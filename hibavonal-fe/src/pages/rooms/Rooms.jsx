@@ -23,14 +23,20 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import GroupIcon from '@mui/icons-material/Group';
 import useRooms from '../../api/hooks/useRooms';
+import useAppStore from '../../store/useAppStore';
+import AssignStudentDialog from './AssignStudentDialog';
 
 const Rooms = () => {
   const { rooms, isLoading, error, createRoom, updateRoom, deleteRoom } =
     useRooms();
+  const { user } = useAppStore();
+  const isAdmin = user?.role === 'admin';
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [assignRoom, setAssignRoom] = useState(null);
   const [editingRoom, setEditingRoom] = useState(null);
   const [deletingRoom, setDeletingRoom] = useState(null);
   const [formName, setFormName] = useState('');
@@ -117,13 +123,15 @@ const Rooms = () => {
         }}
       >
         <Typography variant="h5">Room Management</Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={openCreateDialog}
-        >
-          Add Room
-        </Button>
+        {isAdmin && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={openCreateDialog}
+          >
+            Add Room
+          </Button>
+        )}
       </Box>
 
       {error && (
@@ -154,19 +162,32 @@ const Rooms = () => {
                   <TableCell>{room.name}</TableCell>
                   <TableCell>{room.notes || '—'}</TableCell>
                   <TableCell align="right">
-                    <IconButton
-                      size="small"
-                      onClick={() => openEditDialog(room)}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      color="error"
-                      onClick={() => openDeleteDialog(room)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
+                    {isAdmin && (
+                      <IconButton
+                        size="small"
+                        title="Assign students"
+                        onClick={() => setAssignRoom(room)}
+                      >
+                        <GroupIcon />
+                      </IconButton>
+                    )}
+                    {isAdmin && (
+                      <IconButton
+                        size="small"
+                        onClick={() => openEditDialog(room)}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    )}
+                    {isAdmin && (
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => openDeleteDialog(room)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    )}
                   </TableCell>
                 </TableRow>
               ))
@@ -248,6 +269,11 @@ const Rooms = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <AssignStudentDialog
+        open={!!assignRoom}
+        room={assignRoom}
+        onClose={() => setAssignRoom(null)}
+      />
     </Container>
   );
 };

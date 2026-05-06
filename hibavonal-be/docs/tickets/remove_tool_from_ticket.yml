@@ -1,0 +1,31 @@
+tags:
+  - Tickets
+summary: Remove a tool from a ticket's type (maintainer only)
+security:
+  - Bearer: []
+parameters:
+  - in: path
+    name: ticket_id
+    type: integer
+    required: true
+  - in: path
+    name: tool_id
+    type: integer
+    required: true
+responses:
+  200:
+    description: Ticket with updated tool list
+    schema:
+      $ref: '#/definitions/TicketWithTools'
+  401:
+    description: Missing or invalid token
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Insufficient permissions
+    schema:
+      $ref: '#/definitions/Error'
+  404:
+    description: Ticket or tool association not found
+    schema:
+      $ref: '#/definitions/Error'

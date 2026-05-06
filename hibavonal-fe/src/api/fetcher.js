@@ -51,12 +51,14 @@ export async function apiPost(url, body) {
   let data = null;
   try {
     data = await res.json();
-  } catch (err) {
+  } catch {
     data = null;
   }
 
   if (!res.ok) {
-    const error = new Error(data?.error || `API error: ${res.status} ${res.statusText}`);
+    const error = new Error(
+      data?.error || `API error: ${res.status} ${res.statusText}`
+    );
     error.status = res.status;
     error.info = data || { error: res.statusText };
     throw error;

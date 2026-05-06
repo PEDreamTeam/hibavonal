@@ -1,70 +1,50 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
+  Alert,
   Box,
+  Button,
+  Chip,
+  CircularProgress,
   Container,
-  Typography,
+  IconButton,
+  Menu,
+  MenuItem,
+  Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  Chip,
-  CircularProgress,
-  Alert,
+  Typography,
 } from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import useAppStore from '../../store/useAppStore';
+import useToolOrdersList from '../../api/hooks/useToolOrdersList';
+import ToolOrderDialog from './ToolOrderDialog';
+
+const STATUS_OPTIONS = [
+  { value: 'ordered', label: 'Ordered' },
+  { value: 'ready', label: 'Ready' },
+];
 
 const ToolOrdersList = () => {
-  const [toolOrders, setToolOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const { user } = useAppStore();
+  const { toolOrders, isLoading, error, updateToolOrderStatus } =
+    useToolOrdersList();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
-  useEffect(() => {
-    const fetchToolOrders = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/tool-orders/list', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
+  const canOrderTool =
+    user?.role === 'maintenance_manager' || user?.role === 'admin';
+  const canChangeStatus = user?.role === 'admin';
 
-        if (!response.ok) {
-          if (response.status === 403) {
-            setError('You do not have permission to view tool orders');
-          } else {
-            throw new Error(`Failed to fetch tool orders: ${response.status}`);
-          }
-          setLoading(false);
-          return;
-        }
-
-        const data = await response.json();
-        setToolOrders(data);
-        setError(null);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchToolOrders();
-  }, []);
-
-  const getStatusColor = (status) => {
-    return status === 'ordered' ? 'warning' : 'success';
-  };
-
-  const getStatusLabel = (status) => {
-    return status === 'ordered' ? 'Ordered' : 'Ready';
-  };
+  const getStatusColor = (status) =>
+    status === 'ordered' ? 'warning' : 'success';
+  const getStatusLabel = (status) =>
+    status === 'ordered' ? 'Ordered' : 'Ready';
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -77,7 +57,23 @@ const ToolOrdersList = () => {
     });
   };
 
-  if (loading) {
+  const handleMenuOpen = (event, order) => {
+    setSelectedOrder(order);
+    setMenuAnchor(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchor(null);
+    setSelectedOrder(null);
+  };
+
+  const handleStatusChange = async (status) => {
+    if (!selectedOrder) return;
+    await updateToolOrderStatus(selectedOrder.tool_order_id, status);
+    handleMenuClose();
+  };
+
+  if (isLoading) {
     return (
       <Container maxWidth="lg">
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
@@ -90,9 +86,21 @@ const ToolOrdersList = () => {
   return (
     <Container maxWidth="lg">
       <Box sx={{ py: 4 }}>
-        <Typography variant="h4" sx={{ mb: 3 }}>
-          Tool Orders
-        </Typography>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ mb: 3 }}
+        >
+          <Typography variant="h4">Tool Orders</Typography>
+          <Stack direction="row" spacing={1}>
+            {canOrderTool && (
+              <Button variant="contained" onClick={() => setDialogOpen(true)}>
+                Order a new tool
+              </Button>
+            )}
+          </Stack>
+        </Stack>
 
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -108,18 +116,21 @@ const ToolOrdersList = () => {
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
-                <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                <TableRow sx={{ backgroundColor: 'action.hover' }}>
                   <TableCell>Tool Name</TableCell>
                   <TableCell>Order Name</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Created By</TableCell>
                   <TableCell>Date</TableCell>
                   <TableCell>Details</TableCell>
+                  {canChangeStatus && <TableCell />}
                 </TableRow>
               </TableHead>
               <TableBody>
                 {toolOrders.map((order) => (
-                  <TableRow key={order.tool_order_id}>
+                  <TableRow
+                    key={order.tool_order_id}
+                  >
                     <TableCell>{order.tool_name || 'N/A'}</TableCell>
                     <TableCell>{order.name}</TableCell>
                     <TableCell>
@@ -132,9 +143,22 @@ const ToolOrdersList = () => {
                     </TableCell>
                     <TableCell>{order.created_by || 'N/A'}</TableCell>
                     <TableCell>{formatDate(order.created_at)}</TableCell>
-                    <TableCell sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <TableCell
+                      sx={{
+                        maxWidth: 200,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
                       {order.details || '-'}
                     </TableCell>
+                    {canChangeStatus && (
+                      <TableCell align="right" sx={{ py: 0 }}>
+                        <IconButton size="small" onClick={(e) => handleMenuOpen(e, order)}>
+                          <MoreVertIcon fontSize="small" />
+                        </IconButton>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
@@ -142,6 +166,30 @@ const ToolOrdersList = () => {
           </TableContainer>
         )}
       </Box>
+
+      <Menu
+        open={Boolean(menuAnchor)}
+        anchorEl={menuAnchor}
+        onClose={handleMenuClose}
+      >
+        <Typography
+          variant="caption"
+          sx={{ px: 2, py: 0.5, display: 'block', color: 'text.secondary' }}
+        >
+          Set status
+        </Typography>
+        {STATUS_OPTIONS.map((option) => (
+          <MenuItem
+            key={option.value}
+            onClick={() => handleStatusChange(option.value)}
+            selected={selectedOrder?.status === option.value}
+          >
+            {option.label}
+          </MenuItem>
+        ))}
+      </Menu>
+
+      <ToolOrderDialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
     </Container>
   );
 };
