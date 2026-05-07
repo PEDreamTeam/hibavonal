@@ -175,6 +175,18 @@ def update_ticket_type(ticket_id):
     return jsonify(ticket_to_dict_with_tools(ticket)), 200
 
 
+@tickets_bp.route("/<int:ticket_id>", methods=["DELETE"])
+@role_required("maintenance_manager", "admin")
+def archive_ticket(ticket_id):
+    ticket = Ticket.query.get(ticket_id)
+    if not ticket or ticket.is_deleted:
+        return jsonify({"error": "Ticket not found"}), 404
+
+    ticket.is_deleted = True
+    db.session.commit()
+    return jsonify({"message": "Ticket archived"}), 200
+
+
 @tickets_bp.route("/<int:ticket_id>/tools/<int:tool_id>", methods=["DELETE"])
 @role_required("maintainer")
 @swag_from(doc_path("tickets", "remove_tool_from_ticket.yml"))

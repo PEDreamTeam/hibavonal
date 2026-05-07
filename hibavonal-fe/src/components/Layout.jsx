@@ -64,11 +64,6 @@ const Layout = ({ children }) => {
       menuItems.push(
         { label: 'Rooms', icon: <MeetingRoomIcon />, path: '/rooms' },
         { label: 'Tools', icon: <HandymanIcon />, path: '/tools' },
-        {
-          label: 'Tool Orders',
-          icon: <StorageIcon />,
-          path: '/tool-orders/list',
-        },
         { label: 'Settings', icon: <SettingsIcon />, path: '/settings' }
       );
     }

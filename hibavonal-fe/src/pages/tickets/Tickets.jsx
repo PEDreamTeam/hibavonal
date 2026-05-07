@@ -35,10 +35,12 @@ const statusLabels = {
 function TicketItem({
   ticket,
   isStudent,
+  canArchive,
   statusAction,
   onMarkStatus,
   onViewDetails,
   onShowFeedbacks,
+  onArchive,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -95,7 +97,16 @@ function TicketItem({
                 Give feedback
               </MenuItem>
             )}
-            {!isStudent && <MenuItem onClick={close}>Archive</MenuItem>}
+            {canArchive && (
+              <MenuItem
+                onClick={() => {
+                  close();
+                  onArchive(ticket);
+                }}
+              >
+                Archive
+              </MenuItem>
+            )}
           </Menu>
         </>
       }
@@ -112,10 +123,12 @@ function TicketGroup({
   title,
   tickets,
   isStudent,
+  canArchive,
   statusAction,
   onMarkStatus,
   onViewDetails,
   onShowFeedbacks,
+  onArchive,
 }) {
   if (!tickets.length) return null;
   return (
@@ -137,10 +150,12 @@ function TicketGroup({
               key={ticket.id}
               ticket={ticket}
               isStudent={isStudent}
+              canArchive={canArchive}
               statusAction={statusAction}
               onMarkStatus={onMarkStatus}
               onViewDetails={onViewDetails}
               onShowFeedbacks={onShowFeedbacks}
+              onArchive={onArchive}
             />
           ))}
         </List>
@@ -166,7 +181,13 @@ export default function Tickets() {
   const [statusError, setStatusError] = useState(null);
 
   const { user } = useAppStore();
-  const { tickets: raw, isLoading, error, updateTicketStatus } = useTickets();
+  const {
+    tickets: raw,
+    isLoading,
+    error,
+    updateTicketStatus,
+    archiveTicket,
+  } = useTickets();
 
   const isStudent = user?.role === 'student';
 
@@ -185,6 +206,16 @@ export default function Tickets() {
     } catch (err) {
       setStatusError(
         err?.info?.error || err?.message || 'Failed to update status'
+      );
+    }
+  };
+
+  const handleArchive = async (ticket) => {
+    try {
+      await archiveTicket(ticket.id);
+    } catch (err) {
+      setStatusError(
+        err?.info?.error || err?.message || 'Failed to archive ticket'
       );
     }
   };
@@ -209,12 +240,17 @@ export default function Tickets() {
     );
   }
 
+  const canArchive =
+    user?.role === 'admin' || user?.role === 'maintenance_manager';
+
   const groupProps = {
     isStudent,
+    canArchive,
     statusAction,
     onMarkStatus: handleMarkStatus,
     onViewDetails: (t) => setDetailTicketId(t.id),
     onShowFeedbacks: (t) => setFeedbackTicketId(t.id),
+    onArchive: handleArchive,
   };
 
   return (

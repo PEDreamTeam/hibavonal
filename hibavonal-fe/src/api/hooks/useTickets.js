@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { fetcher, apiPost, apiPut } from '../fetcher';
+import { fetcher, apiPost, apiPut, apiDelete } from '../fetcher';
 
 const useTickets = () => {
   const { data, error, isLoading, mutate } = useSWR('/api/tickets', fetcher);
@@ -32,6 +32,11 @@ const useTickets = () => {
     return ticket;
   };
 
+  const archiveTicket = async (ticketId) => {
+    await apiDelete(`/api/tickets/${ticketId}`);
+    await mutate();
+  };
+
   return {
     tickets: data || [],
     isLoading,
@@ -40,6 +45,7 @@ const useTickets = () => {
     updateTicketStatus,
     updateTicketType,
     assignMaintainer,
+    archiveTicket,
   };
 };
 
